@@ -1,0 +1,11 @@
+" this is just a project file for the Vjde vim plugin, it is probably no use
+" to you unless you actually use it... even so you may want to override the 
+" paths to something more useful
+
+let g:vjde_out_path='.'
+let g:vjde_lib_path='/opt/android-sdk/platforms/android-8/android.jar:build.classes'
+let g:vjde_web_app=''
+let g:vjde_test_path=''
+let g:vjde_java_command='java'
+let g:vjde_show_paras=0
+let g:vjde_xml_advance=0

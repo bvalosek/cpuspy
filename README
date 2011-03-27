@@ -1,0 +1,8 @@
+cpufreq
+
+(c) 2011 Brandon Valosek <bvalosek@gmail.com>
+
+Simple app used to show time spent in each CPU state
+
+Tested only on Samsung Galaxy S (AT&T Captivate), may work on other
+phones.
