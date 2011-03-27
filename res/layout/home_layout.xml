@@ -4,10 +4,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="Hello World, HomeActivity"
-    />
+
+   <ListView
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/ui_states_list"
+   />
+
 </LinearLayout>
 
