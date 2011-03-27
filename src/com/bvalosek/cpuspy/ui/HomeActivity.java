@@ -12,12 +12,13 @@ package com.bvalosek.cpuspy.ui;
 
 // my stuff
 import com.bvalosek.cpuspy.*;
+import com.bvalosek.cpuspy.CpuSpyApp.CpuState;
 
 // imports
 import android.app.Activity;
 import android.os.Bundle;
-import java.util.Map;
 import android.util.Log;
+import java.util.List;
 
 /** main activity class */
 public class HomeActivity extends Activity
@@ -37,14 +38,10 @@ public class HomeActivity extends Activity
       mApp = (CpuSpyApp)getApplicationContext ();
 
       // get proc
-      Map<Integer,Integer> states = mApp.getTimeInStates ();
+      List<CpuState> states = mApp.getTimeInStates ();
 
-      for (Map.Entry<Integer,Integer> entry : states.entrySet() ) {
-         int freq = entry.getKey();
-         int time = entry.getValue ();
-
-         Log.d ("cpuspy", "freq=" + freq + " time=" + time);
+      for (CpuState state : states) {
+         Log.d ("cpuspy", "freq=" + state.freq + " dur=" + state.duration );
       }
-
    }
 }

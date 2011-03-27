@@ -18,8 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -27,9 +27,16 @@ public class CpuSpyApp extends Application {
    public static final String TIME_IN_STATE_PATH =
       "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
 
+   /** simple struct for states/time */
+   public class CpuState {
+      public CpuState(int a, int b) { freq = a; duration =b; }
+      public int freq = 0;
+      public int duration = 0;
+   }
+   
    /** get the time-in-states info */
-   public Map<Integer, Integer> getTimeInStates () {
-      Map<Integer, Integer> states = new LinkedHashMap<Integer, Integer>();
+   public List<CpuState> getTimeInStates () {
+      List<CpuState> states = new ArrayList<CpuState>();
 
       try {
          // create a buffered reader to read in the time-in-states log
@@ -42,7 +49,8 @@ public class CpuSpyApp extends Application {
          while ( (line = br.readLine ()) != null ) {
             // split open line and convert to Integers
             String[] nums = line.split (" ");
-            states.put (Integer.parseInt(nums[0]), Integer.parseInt(nums[1]) );
+            states.add ( new CpuState  (
+               Integer.parseInt (nums[0]), Integer.parseInt (nums[1]) ) );
          }
 
          is.close ();
