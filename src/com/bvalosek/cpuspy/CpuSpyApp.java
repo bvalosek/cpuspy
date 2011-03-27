@@ -27,6 +27,14 @@ public class CpuSpyApp extends Application {
    public static final String TIME_IN_STATE_PATH =
       "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
 
+   /** array of the states / duration */
+   private List<CpuState> mStates = new ArrayList<CpuState>();
+
+   /** access state list */
+   public List<CpuState> getStates () {
+   	return mStates;
+   }
+
    /** simple struct for states/time */
    public class CpuState {
       public CpuState(int a, int b) { freq = a; duration =b; }
@@ -35,7 +43,7 @@ public class CpuSpyApp extends Application {
    }
    
    /** get the time-in-states info */
-   public List<CpuState> getTimeInStates () {
+   public List<CpuState> updateTimeInStates () {
       List<CpuState> states = new ArrayList<CpuState>();
 
       try {
@@ -44,7 +52,8 @@ public class CpuSpyApp extends Application {
          InputStreamReader ir = new InputStreamReader (is);
          BufferedReader br = new BufferedReader (ir);
 
-         // read in the lines
+         // clear out the array and read in the new state lines
+         states.clear ();
          String line;
          while ( (line = br.readLine ()) != null ) {
             // split open line and convert to Integers
