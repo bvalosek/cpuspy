@@ -35,6 +35,17 @@ public class CpuSpyApp extends Application {
    	return mStates;
    }
 
+   /** get the total state time */
+   public int getTotalStateTime () {
+   	// looop through and add up
+   	int r = 0;
+   	for (CpuState state : mStates) {
+   		r += state.duration;
+   	}
+
+   	return r;
+   }
+
    /** simple struct for states/time */
    public class CpuState {
       public CpuState(int a, int b) { freq = a; duration =b; }
@@ -44,8 +55,6 @@ public class CpuSpyApp extends Application {
    
    /** get the time-in-states info */
    public List<CpuState> updateTimeInStates () {
-      List<CpuState> states = new ArrayList<CpuState>();
-
       try {
          // create a buffered reader to read in the time-in-states log
          InputStream is = new FileInputStream (TIME_IN_STATE_PATH);
@@ -53,12 +62,12 @@ public class CpuSpyApp extends Application {
          BufferedReader br = new BufferedReader (ir);
 
          // clear out the array and read in the new state lines
-         states.clear ();
+         mStates.clear ();
          String line;
          while ( (line = br.readLine ()) != null ) {
             // split open line and convert to Integers
             String[] nums = line.split (" ");
-            states.add ( new CpuState  (
+            mStates.add ( new CpuState  (
                Integer.parseInt (nums[0]), Integer.parseInt (nums[1]) ) );
          }
 
@@ -70,7 +79,7 @@ public class CpuSpyApp extends Application {
       }
 
       // made it
-      return states;
+      return mStates;
    }
 
 }
