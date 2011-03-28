@@ -20,7 +20,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#222222"
-            android:padding="4dp"
+            android:padding="3dp"
             android:text="Time In State"
          />
 
@@ -51,7 +51,7 @@
             android:background="#222222"
             android:visibility="gone"
             android:id="@+id/ui_header_additional_states"
-            android:padding="4dp"
+            android:padding="3dp"
             android:text="Unused CPU states"
          />
 
@@ -61,13 +61,12 @@
             android:visibility="gone"
             android:id="@+id/ui_additional_states"
             android:padding="6dp"
-            android:text="1400 MHz, 1200 MHz, 112asdfasf0 MHz"
          />
             
          <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp"
+            android:padding="3dp"
             android:background="#222222"
             android:text="Kernel Info"
          />
