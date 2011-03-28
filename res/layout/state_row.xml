@@ -42,10 +42,12 @@
 
    <ProgressBar
       android:layout_width="fill_parent" 
-      android:layout_height="wrap_content" 
+      android:layout_height="10dp" 
       style="?android:attr/progressBarStyleHorizontal"
       android:id="@+id/ui_bar"
       android:max="100"
    />
+
+   
 
 </LinearLayout>
