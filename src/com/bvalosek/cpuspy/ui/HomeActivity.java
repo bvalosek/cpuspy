@@ -71,7 +71,7 @@ public class HomeActivity extends Activity
       mUiStatesWarning = (TextView)findViewById (R.id.ui_states_warning);
 
       // update title
-      setTitle(getResources().getText(R.string.app_name) + " " + 
+      setTitle(getResources().getText(R.string.app_name) + " v" + 
          getResources().getText(R.string.version_name) );
 
       // draw all the info
