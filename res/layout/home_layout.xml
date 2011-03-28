@@ -20,7 +20,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#222222"
-            android:text="Time In States"
+            android:padding="4dp"
+            android:text="Time In State"
          />
 
          <LinearLayout
@@ -46,10 +47,12 @@
          <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
             android:background="#222222"
             android:visibility="gone"
             android:id="@+id/ui_header_additional_states"
-            android:text="Additional CPU states"
+            android:padding="4dp"
+            android:text="Unused CPU states"
          />
 
          <TextView
@@ -64,6 +67,7 @@
          <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:padding="4dp"
             android:background="#222222"
             android:text="Kernel Info"
          />

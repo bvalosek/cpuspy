@@ -5,7 +5,6 @@
    android:orientation="vertical"
    android:layout_width="match_parent"
    android:layout_height="wrap_content"
-   android:padding="6dp"
 >
 
    <LinearLayout
@@ -27,15 +26,16 @@
          android:id="@+id/ui_duration_text"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_gravity="right"
+         android:gravity="right"
          android:layout_weight="1"
          android:layout_marginRight="5dp"
       />
 
       <TextView
          android:id="@+id/ui_percentage_text"
-         android:layout_width="wrap_content"
+         android:layout_width="70dp"
          android:layout_height="wrap_content"
+         android:gravity="right"
          android:layout_weight="0"
          android:layout_marginRight="5dp"
       />
@@ -51,6 +51,11 @@
       android:max="100"
    />
 
-   
+   <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="1px"
+      android:layout_marginTop="5dp"
+      android:background="#444"
+   />
 
 </LinearLayout>
