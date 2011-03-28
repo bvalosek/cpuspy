@@ -191,6 +191,11 @@ public class HomeActivity extends Activity
          updateData ();
          updateView ();
          break;
+      case R.id.menu_reset:
+         mApp.resetStates();
+         updateData ();
+         updateView();
+      	break;
       }
 
       // made it

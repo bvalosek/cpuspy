@@ -6,4 +6,8 @@
          android:icon="@drawable/ic_menu_refresh"
    />
    
+   <item android:id="@+id/menu_reset"
+         android:title="Reset States"
+         android:icon="@android:drawable/ic_menu_revert"
+   />
 </menu>

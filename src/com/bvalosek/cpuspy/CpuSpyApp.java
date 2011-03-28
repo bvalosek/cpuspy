@@ -42,7 +42,20 @@ public class CpuSpyApp extends Application {
 
    /** access state list */
    public List<CpuState> getStates () {
-   	return mStates;
+      List<CpuState> ret = new ArrayList<CpuState>();
+
+      /* if we have an offset for a state, subtract it, otherwise
+       * just go with it */
+      for (CpuState state : mStates) {
+         int dur = state.duration;
+         if (mOffsets.containsKey(state.freq) ) {
+            dur = state.duration - mOffsets.get (state.freq);
+         }
+         
+         ret.add( new CpuState (state.freq, dur) );
+      }
+
+      return ret;
    }
 
    /** access kerenl string*/
@@ -52,13 +65,13 @@ public class CpuSpyApp extends Application {
 
    /** get the total state time */
    public int getTotalStateTime () {
-   	// looop through and add up
-   	int r = 0;
-   	for (CpuState state : mStates) {
-   		r += state.duration;
-   	}
+      // looop through and add up
+      int r = 0;
+      for (CpuState state : mStates) {
+         r += state.duration;
+      }
 
-   	return r;
+      return r;
    }
 
    /** simple struct for states/time */
@@ -69,7 +82,7 @@ public class CpuSpyApp extends Application {
    }
  
    /** update offsets to "reset" state times */
-   public List<CpuState> resetCpuStates () {
+   public List<CpuState> resetStates () {
       // loop through current states and set the offsets
       for (CpuState state : mStates) {
          mOffsets.put (state.freq, state.duration);
