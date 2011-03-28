@@ -54,6 +54,7 @@ public class HomeActivity extends Activity
       mUiStatesView = (LinearLayout)findViewById (R.id.ui_states_view);
 
       // draw all the info
+      updateDate ();
       updateView ();
    }
 
@@ -61,11 +62,16 @@ public class HomeActivity extends Activity
    public void updateView () {
 
       // FILL IT UP
-      mApp.updateTimeInStates ();
       for (CpuState state : mApp.getStates () ) {
          generateStateRow (state, mUiStatesView);
       }
 
+   }
+
+   /** update the data */
+   public void updateData () {
+      // get the time spent in states
+      mApp.updateTimeInStates ();
    }
 
    /** spit out a view representing a cpustate so we can cram it into a ScrollView */
@@ -78,6 +84,9 @@ public class HomeActivity extends Activity
       // what percetnage we've got
       float per = (float)state.duration * 100 / mApp.getTotalStateTime (); 
 
+      // pretty freq string
+      String sFreq = state.freq / 1000 + " MHz";
+
       // map UI elements to objects
       TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);
       TextView durText = (TextView)theRow.findViewById(R.id.ui_duration_text);
@@ -85,7 +94,7 @@ public class HomeActivity extends Activity
       ProgressBar bar = (ProgressBar)theRow.findViewById(R.id.ui_bar);
 
       // modify the row
-      freqText.setText (Integer.toString (state.freq));
+      freqText.setText (sFreq);
       perText.setText (Float.toString (per) );
       durText.setText (Integer.toString(state.duration));
       bar.setProgress ( (int)per);
