@@ -70,6 +70,10 @@ public class HomeActivity extends Activity
          R.id.ui_header_additional_states);
       mUiStatesWarning = (TextView)findViewById (R.id.ui_states_warning);
 
+      // update title
+      setTitle(getResources().getText(R.string.app_name) + " " + 
+         getResources().getText(R.string.version_name) );
+
       // draw all the info
       updateData ();
    }
