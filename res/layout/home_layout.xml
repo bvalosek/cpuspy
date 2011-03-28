@@ -29,6 +29,18 @@
             android:layout_height="wrap_content"
             android:id="@+id/ui_states_view"
          />
+         
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:background="#551111"
+            android:text="No states file found. Are you sure your phone is compatible?"
+            android:visibility="gone"
+            android:id="@+id/ui_states_warning"
+         />
 
 
          <TextView
