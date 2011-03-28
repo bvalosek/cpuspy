@@ -20,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -28,6 +30,9 @@ public class CpuSpyApp extends Application {
       "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
 
    public static final String VERSION_PATH = "/proc/version";
+
+   /** offsets used if user reset */
+   private Map<Integer, Integer> mOffsets = new HashMap<Integer, Integer>();
 
    /** array of the states / duration */
    private List<CpuState> mStates = new ArrayList<CpuState>();
@@ -62,7 +67,18 @@ public class CpuSpyApp extends Application {
       public int freq = 0;
       public int duration = 0;
    }
-  
+ 
+   /** update offsets to "reset" state times */
+   public List<CpuState> resetCpuStates () {
+      // loop through current states and set the offsets
+      for (CpuState state : mStates) {
+         mOffsets.put (state.freq, state.duration);
+      }
+      
+      // return states with offsets
+      return getStates ();
+   }
+
    /** get the kernel string */
    public String updateKernelString () {
       try {
