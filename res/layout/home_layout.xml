@@ -5,37 +5,53 @@
     android:layout_height="fill_parent"
     >
 
-<!--   <ListView
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:id="@+id/ui_states_list"
-   />
--->
-
-   <LinearLayout
+   <ScrollView
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
-      android:id="@+id/ui_main_scroll"
-      android:orientation="vertical" 
-
    >
-      <TextView
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:background="#222222"
-         android:text="Time In States"
-      />
-
 
       <LinearLayout
-         android:orientation="vertical"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:id="@+id/ui_states_view"
-      />
+         android:layout_height="fill_parent"
+         android:orientation="vertical" 
 
-   </LinearLayout>
+      >
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#222222"
+            android:text="Kernel Info"
+         />
 
+
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Kernel"
+            android:textSize="19dp"
+            android:textColor="#dddddd"
+            android:padding="10dp"
+            android:id="@+id/ui_kernel_string"
+         />
+
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#222222"
+            android:text="Time In States"
+         />
+
+         <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ui_states_view"
+         />
+
+      </LinearLayout>
+
+
+   </ScrollView>
 
 </LinearLayout>
 
