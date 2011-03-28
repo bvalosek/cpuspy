@@ -74,7 +74,7 @@ public class CpuSpyApp extends Application {
          // clear out the array and read in the new state lines
          String line;
          while ( (line = br.readLine ()) != null ) {
-         	// nop
+            mKernelString = line;
          }
 
          is.close ();
@@ -84,8 +84,6 @@ public class CpuSpyApp extends Application {
          return null;
       }
 
-      mKernelString = line;
-      
       // made it
       return mKernelString;
    }
