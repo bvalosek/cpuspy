@@ -17,7 +17,9 @@
          android:id="@+id/ui_freq_text"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:text="freq"
+         android:textSize="17dp"
+         android:textColor="#ffffff"
+         android:layout_weight="1"
          android:layout_marginRight="5dp"
       />
 
@@ -25,7 +27,8 @@
          android:id="@+id/ui_duration_text"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:text="duration"
+         android:layout_gravity="right"
+         android:layout_weight="1"
          android:layout_marginRight="5dp"
       />
 
@@ -33,7 +36,7 @@
          android:id="@+id/ui_percentage_text"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:text="duration"
+         android:layout_weight="0"
          android:layout_marginRight="5dp"
       />
 
