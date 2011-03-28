@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ScrollView;
+import android.widget.ProgressBar;
 
 /** main activity class */
 public class HomeActivity extends Activity
@@ -52,6 +53,13 @@ public class HomeActivity extends Activity
       // find views
       mUiStatesView = (LinearLayout)findViewById (R.id.ui_states_view);
 
+      // draw all the info
+      updateView ();
+   }
+
+   /** update the view */
+   public void updateView () {
+
       // FILL IT UP
       mApp.updateTimeInStates ();
       for (CpuState state : mApp.getStates () ) {
@@ -74,11 +82,13 @@ public class HomeActivity extends Activity
       TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);
       TextView durText = (TextView)theRow.findViewById(R.id.ui_duration_text);
       TextView perText = (TextView)theRow.findViewById(R.id.ui_percentage_text);
+      ProgressBar bar = (ProgressBar)theRow.findViewById(R.id.ui_bar);
 
       // modify the row
       freqText.setText (Integer.toString (state.freq));
       perText.setText (Float.toString (per) );
       durText.setText (Integer.toString(state.duration));
+      bar.setProgress ( (int)per);
 
       // add it to parent and return
       parent.addView(theRow);

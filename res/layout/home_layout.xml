@@ -12,23 +12,29 @@
    />
 -->
 
-   <ScrollView
+   <LinearLayout
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:id="@+id/ui_main_scroll"
-   
+      android:orientation="vertical" 
 
    >
+      <TextView
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:background="#222222"
+         android:text="Time In States"
+      />
+
 
       <LinearLayout
          android:orientation="vertical"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:id="@+id/ui_states_view"
-
       />
 
-   </ScrollView>
+   </LinearLayout>
 
 
 </LinearLayout>
