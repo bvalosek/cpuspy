@@ -7,7 +7,12 @@
    />
    
    <item android:id="@+id/menu_reset"
-         android:title="Reset States"
+         android:title="Reset Timers"
+         android:icon="@android:drawable/ic_menu_delete"
+   />
+   
+   <item android:id="@+id/menu_restore"
+         android:title="Restore Timers"
          android:icon="@android:drawable/ic_menu_revert"
    />
 </menu>

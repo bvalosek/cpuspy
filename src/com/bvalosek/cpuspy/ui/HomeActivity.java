@@ -148,7 +148,7 @@ public class HomeActivity extends Activity
       String sFreq = state.freq / 1000 + " MHz";
       String sPer = (int)per + "%";
       int tSec = state.duration / 100;
-
+      
       int h = (int)Math.floor (tSec / (60*60) );
       int m = (int)Math.floor ( (tSec - h*60*60) / 60);
       int s = tSec % 60;
@@ -200,9 +200,12 @@ public class HomeActivity extends Activity
          break;
       case R.id.menu_reset:
          mApp.resetStates();
-         updateData ();
          updateView();
       	break;
+      case R.id.menu_restore:
+         mApp.restoreStates ();
+         updateView ();
+         break;
       }
 
       // made it

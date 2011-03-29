@@ -102,7 +102,14 @@ public class CpuSpyApp extends Application {
       public int freq = 0;
       public int duration = 0;
    }
- 
+
+   /** remove offsets */
+   public void restoreStates () {
+      updateTimeInStates ();
+      mOffsets.clear ();
+      saveOffsets ();
+   }
+
    /** update offsets to "reset" state times */
    public List<CpuState> resetStates () {
       updateTimeInStates ();
