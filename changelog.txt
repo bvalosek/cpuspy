@@ -1,0 +1,11 @@
+CPU Spy Changes
+---------------
+
+v0.2.0 beta
+-Added "reset timers" option to set all state timers at 0 sec
+-Added "restore timers" to show time-in-state since boot
+-Small UI tweaks
+-Timer now shows hours
+
+v0.1.0 beta
+-Initial Release
