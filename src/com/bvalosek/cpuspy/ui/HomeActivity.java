@@ -147,14 +147,19 @@ public class HomeActivity extends Activity
       // pretty strings
       String sFreq = state.freq / 1000 + " MHz";
       String sPer = (int)per + "%";
-      int h = (int)Math.floor (state.duration / 6000);
-      int m = (state.duration / 100) % 60;
+      int tSec = state.duration / 100;
+
+      int h = (int)Math.floor (tSec / (60*60) );
+      int m = (int)Math.floor ( (tSec - h*60*60) / 60);
+      int s = (state.duration / 100) % 60;
       String sDur;
+      sDur = h + ":";
       if (m < 10)
-      	sDur = h + ":0" + m;
-      else
-      	sDur = h + ":" + m;
-   
+         sDur += "0";
+      sDur += m + ":";
+      if (s < 10)
+      	sDur += "0";
+      sDur += s;
 
       // map UI elements to objects
       TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);

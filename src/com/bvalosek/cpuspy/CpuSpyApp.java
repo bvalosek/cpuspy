@@ -61,6 +61,11 @@ public class CpuSpyApp extends Application {
          int dur = state.duration;
          if (mOffsets.containsKey(state.freq) ) {
             dur = state.duration - mOffsets.get (state.freq);
+
+            // if dur is negative, it means we've rebooted since
+            // last offset save, so clear them out
+            if (dur < 0) 
+            	dur = state.duration;
          }
          
          ret.add( new CpuState (state.freq, dur) );
