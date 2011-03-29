@@ -151,7 +151,7 @@ public class HomeActivity extends Activity
 
       int h = (int)Math.floor (tSec / (60*60) );
       int m = (int)Math.floor ( (tSec - h*60*60) / 60);
-      int s = (state.duration / 100) % 60;
+      int s = tSec % 60;
       String sDur;
       sDur = h + ":";
       if (m < 10)
