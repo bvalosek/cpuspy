@@ -27,10 +27,14 @@ import android.content.SharedPreferences;
 /** main application class */
 public class CpuSpyApp extends Application {
 
+   // various FS points we query
    public static final String TIME_IN_STATE_PATH =
       "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
-
    public static final String VERSION_PATH = "/proc/version";
+
+   // used during settings save
+   private static final String PREF_NAME = "cpuspy";
+   private static final String PREF_OFFSETS = "cpuOffsets";
 
    /** offsets used if user reset */
    private Map<Integer, Integer> mOffsets = new HashMap<Integer, Integer>();
@@ -45,7 +49,6 @@ public class CpuSpyApp extends Application {
    @Override public void onCreate () {
       // load offsets
       loadOffsets ();
-
    }
 
    /** access state list */
@@ -97,6 +100,8 @@ public class CpuSpyApp extends Application {
  
    /** update offsets to "reset" state times */
    public List<CpuState> resetStates () {
+      updateTimeInStates ();
+
       // loop through current states and set the offsets
       for (CpuState state : mStates) {
          mOffsets.put (state.freq, state.duration);
@@ -109,13 +114,17 @@ public class CpuSpyApp extends Application {
   
    /** loads offset prefs */
    public void loadOffsets () {
-      SharedPreferences settings = getSharedPreferences ("cpuspy", 0);
-      String prefs = settings.getString ("cpuOffsets", "");
+      SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
+      String prefs = settings.getString (PREF_OFFSETS, "");
 
+      if (prefs == null || prefs.length() < 1) {
+      	return;
+      }
+
+      // each offset seperated by commas
       String[] offsets = prefs.split (",");
-
       for (String offset : offsets) {
-         // get parts
+         // drop in the offsets
          String[] parts = offset.split(" ");
          mOffsets.put (Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) );
       }
