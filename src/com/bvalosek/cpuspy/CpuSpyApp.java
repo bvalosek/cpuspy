@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import android.content.SharedPreferences;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -39,6 +40,13 @@ public class CpuSpyApp extends Application {
 
    /** kernel build string */
    private String mKernelString = "";
+
+   /** on startup */
+   @Override public void onCreate () {
+      // load offsets
+      loadOffsets ();
+
+   }
 
    /** access state list */
    public List<CpuState> getStates () {
@@ -70,8 +78,14 @@ public class CpuSpyApp extends Application {
       for (CpuState state : mStates) {
          r += state.duration;
       }
+      
+      // account for offsets
+      int offs = 0;
+      for (Map.Entry<Integer,Integer> entry : mOffsets.entrySet() ) {
+         offs += entry.getValue ();
+      }
 
-      return r;
+      return r - offs;
    }
 
    /** simple struct for states/time */
@@ -89,7 +103,39 @@ public class CpuSpyApp extends Application {
       }
       
       // return states with offsets
+      saveOffsets ();
       return getStates ();
+   }
+  
+   /** loads offset prefs */
+   public void loadOffsets () {
+      SharedPreferences settings = getSharedPreferences ("cpuspy", 0);
+      String prefs = settings.getString ("cpuOffsets", "");
+
+      String[] offsets = prefs.split (",");
+
+      for (String offset : offsets) {
+         // get parts
+         String[] parts = offset.split(" ");
+         mOffsets.put (Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) );
+      }
+   }
+
+   /** saves the offset prefs */
+   public void saveOffsets () {
+      SharedPreferences settings = getSharedPreferences ("cpuspy", 0);
+      SharedPreferences.Editor editor = settings.edit ();
+
+      // add each offset
+      String str = "";
+      for (Map.Entry<Integer,Integer> entry : mOffsets.entrySet() ) {
+         str += entry.getKey() + " " + entry.getValue() + ",";
+      }
+     
+      // write the pref
+      Log.d ("cpuspy", "pref string: " + str);
+      editor.putString ("cpuOffsets", str);
+      editor.commit ();
    }
 
    /** get the kernel string */
