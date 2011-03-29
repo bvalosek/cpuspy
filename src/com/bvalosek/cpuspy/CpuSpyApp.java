@@ -142,7 +142,6 @@ public class CpuSpyApp extends Application {
       }
      
       // write the pref
-      Log.d ("cpuspy", "pref string: " + str);
       editor.putString ("cpuOffsets", str);
       editor.commit ();
    }
