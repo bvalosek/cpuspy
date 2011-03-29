@@ -116,8 +116,10 @@ public class HomeActivity extends Activity
          mUiAdditionalStates.setVisibility(View.VISIBLE);
          mUiHeaderAdditionalStates.setVisibility (View.VISIBLE);
          mUiAdditionalStates.setText (str);
+      } else {
+      	mUiAdditionalStates.setVisibility(View.GONE);
+      	mUiHeaderAdditionalStates.setVisibility(View.GONE);
       }
-
 
       // kernel line
       mUiKernelString.setText ( mApp.getKernelString () );
