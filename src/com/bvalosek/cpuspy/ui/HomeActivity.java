@@ -51,6 +51,9 @@ public class HomeActivity extends Activity
    /** kernel string */
    private TextView mUiKernelString = null; 
 
+   /** what to call CPU off state */
+   private static final String STR_SLEEP_STATE = "Deep Sleep";
+
    /** Called when the activity is first created. */
    @Override public void onCreate(Bundle savedInstanceState)
    {
@@ -94,7 +97,11 @@ public class HomeActivity extends Activity
          if (state.duration > 0) {
             generateStateRow (state, mUiStatesView);
          } else {
-            extraStates.add (state.freq/1000 + " MHz");
+            if (state.freq == 0) {
+            	extraStates.add (STR_SLEEP_STATE);
+            } else {
+               extraStates.add (state.freq/1000 + " MHz");
+            }
          }
       }
 
@@ -143,12 +150,18 @@ public class HomeActivity extends Activity
 
       // what percetnage we've got
       float per = (float)state.duration * 100 / mApp.getTotalStateTime (); 
-
-      // pretty strings
-      String sFreq = state.freq / 1000 + " MHz";
       String sPer = (int)per + "%";
-      int tSec = state.duration / 100;
       
+      // state name
+      String sFreq;
+      if (state.freq == 0) {
+      	sFreq = STR_SLEEP_STATE;
+      } else {
+         sFreq = state.freq / 1000 + " MHz";
+      } 
+
+      // duration
+      int tSec = state.duration / 100;
       int h = (int)Math.floor (tSec / (60*60) );
       int m = (int)Math.floor ( (tSec - h*60*60) / 60);
       int s = tSec % 60;
