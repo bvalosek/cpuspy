@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -207,6 +208,10 @@ public class CpuSpyApp extends Application {
          Log.e ("cpuspy", e.getMessage() );
          return null;
       }
+
+      // add in sleep state
+      int sleepTime = (int)(SystemClock.elapsedRealtime() - SystemClock.uptimeMillis ()) / 10;
+      mStates.add ( new CpuState (0, sleepTime));
 
       // made it
       return mStates;
