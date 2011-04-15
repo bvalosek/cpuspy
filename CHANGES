@@ -1,6 +1,12 @@
 CPU Spy Changes
 ---------------
 
+v0.2.2 beta
+-States are now sorted from highest to lowest frequency
+
+v0.2.1 beta
+-Added "Deep Sleep" state for when the CPU is off
+
 v0.2.0 beta
 -Added "reset timers" option to set all state timers at 0 sec
 -Added "restore timers" to show time-in-state since boot
