@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.HashMap;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import java.util.Collections;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -65,10 +66,10 @@ public class CpuSpyApp extends Application {
 
             // if dur is negative, it means we've rebooted since
             // last offset save, so clear them out
-            if (dur < 0) 
-            	dur = state.duration;
+            if (dur < 0)
+               dur = state.duration;
          }
-         
+
          ret.add( new CpuState (state.freq, dur) );
       }
 
@@ -87,7 +88,7 @@ public class CpuSpyApp extends Application {
       for (CpuState state : mStates) {
          r += state.duration;
       }
-      
+
       // account for offsets
       int offs = 0;
       for (Map.Entry<Integer,Integer> entry : mOffsets.entrySet() ) {
@@ -98,10 +99,17 @@ public class CpuSpyApp extends Application {
    }
 
    /** simple struct for states/time */
-   public class CpuState {
+   public class CpuState implements Comparable<CpuState> {
       public CpuState(int a, int b) { freq = a; duration =b; }
       public int freq = 0;
       public int duration = 0;
+
+      /** for sorting, compare the freqs */
+      public int compareTo (CpuState state) {
+         Integer a = new Integer (freq);
+         Integer b = new Integer (state.freq);
+         return a.compareTo(b);
+      }
    }
 
    /** remove offsets */
@@ -119,19 +127,19 @@ public class CpuSpyApp extends Application {
       for (CpuState state : mStates) {
          mOffsets.put (state.freq, state.duration);
       }
-      
+
       // return states with offsets
       saveOffsets ();
       return getStates ();
    }
-  
+
    /** loads offset prefs */
    public void loadOffsets () {
       SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
       String prefs = settings.getString (PREF_OFFSETS, "");
 
       if (prefs == null || prefs.length() < 1) {
-      	return;
+         return;
       }
 
       // each offset seperated by commas
@@ -153,7 +161,7 @@ public class CpuSpyApp extends Application {
       for (Map.Entry<Integer,Integer> entry : mOffsets.entrySet() ) {
          str += entry.getKey() + " " + entry.getValue() + ",";
       }
-     
+
       // write the pref
       editor.putString ("cpuOffsets", str);
       editor.commit ();
@@ -212,6 +220,9 @@ public class CpuSpyApp extends Application {
       // add in sleep state
       int sleepTime = (int)(SystemClock.elapsedRealtime() - SystemClock.uptimeMillis ()) / 10;
       mStates.add ( new CpuState (0, sleepTime));
+
+      // sort highest to lowest freq
+      Collections.sort (mStates, Collections.reverseOrder());
 
       // made it
       return mStates;
