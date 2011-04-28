@@ -226,6 +226,10 @@ public class CpuSpyApp extends Application {
          }
       }
 
+      // hacky
+      if (mStates.size() == 0)
+         return null;
+
       return mStates;
    }
 
