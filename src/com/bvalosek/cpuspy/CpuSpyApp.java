@@ -25,6 +25,7 @@ import java.util.HashMap;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import java.util.Collections;
+import java.io.DataOutputStream;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -192,6 +193,59 @@ public class CpuSpyApp extends Application {
       return mKernelString;
    }
 
+   /** cat out the time_in_state as root as an alternative to reading the
+    * file. THis is necesary for ROMs who have blocked user/group read access
+    * to the file due to some bug */
+   private List<CpuState> getStatesAsRoot () {
+      // attempt to cat out the contents of the state file in su
+      Process           process = null;
+      DataOutputStream  out = null;
+      InputStreamReader inReader = null;
+      try {
+         // run su and get an output stream
+         process = Runtime.getRuntime().exec("su");
+         out = new DataOutputStream( process.getOutputStream() );
+         out.writeChars("cat " + TIME_IN_STATE_PATH + "\nexit\n");
+         out.flush();
+
+         // get the output
+         inReader = new InputStreamReader (process.getInputStream() );
+         BufferedReader br = new BufferedReader (inReader);
+         readInStates (br);
+      } catch (Exception e) {
+         Log.d ("cpuspy", "Tried to read file via root cat but failed");
+         Log.e ("cpuspy", e.getMessage() );
+      } finally {
+         // kill everythong
+         try {
+            out.close ();
+            inReader.close ();
+            process.destroy();
+         } catch (Exception e) {
+            Log.e ("cpuspy", e.getMessage() );
+         }
+      }
+
+      return mStates;
+   }
+
+   /** read from a reader the state lines into mStates */
+   private void readInStates (BufferedReader br) {
+      try {
+         // clear out the array and read in the new state lines
+         mStates.clear ();
+         String line;
+         while ( (line = br.readLine ()) != null ) {
+            // split open line and convert to Integers
+            String[] nums = line.split (" ");
+            mStates.add ( new CpuState  (
+               Integer.parseInt (nums[0]), Integer.parseInt (nums[1]) ) );
+         }
+      } catch (Exception e) {
+         Log.e ("cpuspy", e.getMessage() );
+      }
+   }
+
    /** get the time-in-states info */
    public List<CpuState> updateTimeInStates () {
       try {
@@ -214,7 +268,12 @@ public class CpuSpyApp extends Application {
 
       } catch (Exception e) {
          Log.e ("cpuspy", e.getMessage() );
-         return null;
+         Log.d ("cpuspy", "Could not read file normally, trying root");
+
+         // didn't work, blindly try root
+         if (getStatesAsRoot() == null) {
+            return null;
+         }
       }
 
       // add in sleep state
