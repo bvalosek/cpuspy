@@ -255,17 +255,9 @@ public class CpuSpyApp extends Application {
          BufferedReader br = new BufferedReader (ir);
 
          // clear out the array and read in the new state lines
-         mStates.clear ();
-         String line;
-         while ( (line = br.readLine ()) != null ) {
-            // split open line and convert to Integers
-            String[] nums = line.split (" ");
-            mStates.add ( new CpuState  (
-               Integer.parseInt (nums[0]), Integer.parseInt (nums[1]) ) );
-         }
+         readInStates (br);
 
          is.close ();
-
       } catch (Exception e) {
          Log.e ("cpuspy", e.getMessage() );
          Log.d ("cpuspy", "Could not read file normally, trying root");
