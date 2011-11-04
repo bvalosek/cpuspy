@@ -222,7 +222,7 @@ public class CpuSpyApp extends Application {
             inReader.close ();
             process.destroy();
          } catch (Exception e) {
-            Log.e ("cpuspy", e.getMessage() );
+            //Log.e ("cpuspy", e.getMessage() );
          }
       }
 
