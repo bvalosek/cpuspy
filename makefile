@@ -39,8 +39,8 @@ install-debug-device:
 build-release :
 	ant release
 	jarsigner -verbose -keystore $(KEYSTORE) \
-		bin/$(APPNAME)-unsigned.apk $(KEY_ALIAS)
-	mv bin/$(APPNAME)-unsigned.apk bin/$(APPNAME)-unaligned.apk
+		bin/$(APPNAME)-release-unsigned.apk $(KEY_ALIAS)
+	mv bin/$(APPNAME)-release-unsigned.apk bin/$(APPNAME)-unaligned.apk
 	jarsigner -verify -verbose -certs bin/$(APPNAME)-unaligned.apk
 	zipalign -vf 4 bin/$(APPNAME)-unaligned.apk bin/$(APPNAME).apk
 
