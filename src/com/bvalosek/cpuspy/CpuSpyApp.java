@@ -155,7 +155,7 @@ public class CpuSpyApp extends Application {
        CAVEAT: Depending on timing and on the implementation of
        System.currentTimeMillis() and SystemClock.elapsedRealtime(),
        the return value of "boot_time_millis" should be expected to
-       jitter. In other words, subsequent calls to this function will
+       slightly vary. In other words, subsequent calls to this function will
        probably not all yield the same result.  This should be taken
        into account when comparing values.
 
@@ -166,7 +166,7 @@ public class CpuSpyApp extends Application {
        Note that milliseconds are not an appropriate unit here, since
        accuracy of boot time is going to be on the order of seconds.
        Seconds would be more appropriate. However, just reducing the
-       accuracy to seconds will still not eliminate the jitter.
+       accuracy to seconds will still not eliminate the variation.
 
        Note that the return type of "currentTimeMillis" and
        "elapsedRealTime" is "long", so their values can be expected to
@@ -179,11 +179,10 @@ public class CpuSpyApp extends Application {
    /** Loads offset prefs.
 
        If the system was rebooted after last writing offsets, the
-       offsets are ignored.
+       offsets are cleared.
    */
    public void loadOffsets () {
-      SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
-      // FIXME: Check return value above.
+      SharedPreferences settings = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
       String prefs = settings.getString (PREF_OFFSETS, "");
       if (prefs == null || prefs.length() < 1) {
          toast("No saved offsets found.");
@@ -192,15 +191,17 @@ public class CpuSpyApp extends Application {
 
       final String boot_time_s = settings.getString (PREF_BOOT_TIME, "");
       if (null == boot_time_s || boot_time_s.length() < 1) {
-         toast("Saved offsets apply to an unknown boot time, ignoring them.");
+         toast("Saved offsets apply to an unknown boot time, clearing them.");
+         restoreStates();
          return;
       }
       final long boot_time_from_file= Long.parseLong(boot_time_s);
       final long min_boot_cycle_time= 30*1000; // msec
       // Differences less than the assumed boot cycle time
-      // are assumed to be jitter and ignored.
+      // are assumed to be insignificant variation and ignored.
       if (boot_time_from_file + min_boot_cycle_time < boot_time_millis()) {
-         toast("Saved offsets apply to a previous boot, ignoring them.");
+         toast("Saved offsets apply to a previous boot, clearing them.");
+         restoreStates();
          return;
       }
 
@@ -216,7 +217,7 @@ public class CpuSpyApp extends Application {
 
    /** saves the offset prefs */
    public void saveOffsets () {
-      SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
+      SharedPreferences settings = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
       SharedPreferences.Editor editor = settings.edit ();
 
       // add each offset
@@ -228,15 +229,16 @@ public class CpuSpyApp extends Application {
       // write the pref
       /* We store the boot time instead of the current time because
          the boot time is less likely to slip past the next boot time
-         by time adjustments.  If we were to store the current time,
-         the next boot time may be just a few seconds ahead. Because
+         by time adjustments than the current time is.
+
+         The next boot time may be just a few seconds ahead. Because
          shutdown takes just a few seconds, and it may also take only
          a few seconds until elapsedRealTime begins to advance during
          a reboot, time adjustments in the range of seconds can foil a
          comparison of boot time with current time. In contrast, boot
          times are usually at least minutes apart. */
-      editor.putString (PREF_BOOT_TIME, "" + boot_time_millis());
-      editor.putString (PREF_OFFSETS, str);
+      editor.putString(PREF_BOOT_TIME, "" + boot_time_millis());
+      editor.putString(PREF_OFFSETS, str);
       editor.commit ();
    }
 
