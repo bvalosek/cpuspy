@@ -154,7 +154,7 @@ public class CpuSpyApp extends Application {
 
    /** saves the offset prefs */
    public void saveOffsets () {
-      SharedPreferences settings = getSharedPreferences ("cpuspy", 0);
+      SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
       SharedPreferences.Editor editor = settings.edit ();
 
       // add each offset
@@ -164,7 +164,7 @@ public class CpuSpyApp extends Application {
       }
 
       // write the pref
-      editor.putString ("cpuOffsets", str);
+      editor.putString (PREF_OFFSETS, str);
       editor.commit ();
    }
 
