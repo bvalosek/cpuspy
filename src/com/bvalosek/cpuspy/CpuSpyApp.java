@@ -38,6 +38,7 @@ public class CpuSpyApp extends Application {
    // used during settings save
    private static final String PREF_NAME = "cpuspy";
    private static final String PREF_OFFSETS = "cpuOffsets";
+   private static final String PREF_BOOT_TIME = "boot_time";
 
    /** offsets used if user reset */
    private Map<Integer, Integer> mOffsets = new HashMap<Integer, Integer>();
@@ -134,6 +135,35 @@ public class CpuSpyApp extends Application {
       return getStates ();
    }
 
+   /** @return Absolute time at last boot, in milliseconds since the
+       beginning of the epoch.  If the system time is modified, for
+       example using "setCurrentTimeMillis", the result will change in
+       the same way.
+
+       CAVEAT: Depending on timing and on the implementation of
+       System.currentTimeMillis() and SystemClock.elapsedRealtime(),
+       the return value of "boot_time_millis" should be expected to
+       jitter. In other words, subsequent calls to this function will
+       probably not all yield the same result.  This should be taken
+       into account when comparing values.
+
+       FIXME: Is there a more direct and stable method of determining
+       the absolute time at the last boot?  For example, is there a
+       boot log with a time stamp?
+
+       Note that milliseconds are not an appropriate unit here, since
+       accuracy of boot time is going to be on the order of seconds.
+       Seconds would be more appropriate. However, just reducing the
+       accuracy to seconds will still not eliminate the jitter.
+
+       Note that the return type of "currentTimeMillis" and
+       "elapsedRealTime" is "long", so their values can be expected to
+       never wrap.
+   */
+   static long boot_time_millis() {
+      return (System.currentTimeMillis() - SystemClock.elapsedRealtime());
+   }
+
    /** loads offset prefs */
    public void loadOffsets () {
       SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
@@ -164,6 +194,16 @@ public class CpuSpyApp extends Application {
       }
 
       // write the pref
+      /* We store the boot time instead of the current time because
+         the boot time is less likely to slip past the next boot time
+         by time adjustments.  If we were to store the current time,
+         the next boot time may be just a few seconds ahead. Because
+         shutdown takes just a few seconds, and it may also take only
+         a few seconds until elapsedRealTime begins to advance during
+         a reboot, time adjustments in the range of seconds can foil a
+         comparison of boot time with current time. In contrast, boot
+         times are usually at least minutes apart. */
+      editor.putString (PREF_BOOT_TIME, "" + boot_time_millis());
       editor.putString (PREF_OFFSETS, str);
       editor.commit ();
    }
