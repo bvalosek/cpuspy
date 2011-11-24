@@ -164,13 +164,32 @@ public class CpuSpyApp extends Application {
       return (System.currentTimeMillis() - SystemClock.elapsedRealtime());
    }
 
-   /** loads offset prefs */
+   /** Loads offset prefs.
+
+       If the system was rebooted after last writing offsets, the
+       offsets are ignored.
+   */
    public void loadOffsets () {
       SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
+      // FIXME: Check return value above.
       String prefs = settings.getString (PREF_OFFSETS, "");
 
       if (prefs == null || prefs.length() < 1) {
          return;
+      }
+
+      final String boot_time_s = settings.getString (PREF_BOOT_TIME, "");
+      if (null == boot_time_s || boot_time_s.length() < 1) {
+          // Since boot time is unknown, we ignore any offsets.
+         return;
+      }
+      final long boot_time_from_file= Long.parseLong(boot_time_s);
+      final long min_boot_cycle_time= 30*1000; // msec
+      // Differences less than the assumed boot cycle time
+      // are assumed to be jitter and ignored.
+      if (boot_time_from_file + min_boot_cycle_time < boot_time_millis()) {
+          // Ignore offsets since they apply to a previous boot.
+          return;
       }
 
       // each offset seperated by commas
