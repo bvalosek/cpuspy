@@ -14,6 +14,8 @@ package com.bvalosek.cpuspy;
 // imports
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import java.util.Collections;
@@ -48,6 +52,12 @@ public class CpuSpyApp extends Application {
 
    /** kernel build string */
    private String mKernelString = "";
+
+   void toast(final String text) {
+      Log.d("cpuspy", text);
+      Context context= getApplicationContext();
+      Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+   }
 
    /** on startup */
    @Override public void onCreate () {
@@ -119,6 +129,7 @@ public class CpuSpyApp extends Application {
       updateTimeInStates ();
       mOffsets.clear ();
       saveOffsets ();
+      toast("Offsets cleared.");
    }
 
    /** update offsets to "reset" state times */
@@ -132,6 +143,7 @@ public class CpuSpyApp extends Application {
 
       // return states with offsets
       saveOffsets ();
+      toast("Offsets saved.");
       return getStates ();
    }
 
@@ -173,14 +185,14 @@ public class CpuSpyApp extends Application {
       SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
       // FIXME: Check return value above.
       String prefs = settings.getString (PREF_OFFSETS, "");
-
       if (prefs == null || prefs.length() < 1) {
+         toast("No saved offsets found.");
          return;
       }
 
       final String boot_time_s = settings.getString (PREF_BOOT_TIME, "");
       if (null == boot_time_s || boot_time_s.length() < 1) {
-          // Since boot time is unknown, we ignore any offsets.
+         toast("Saved offsets apply to an unknown boot time, ignoring them.");
          return;
       }
       final long boot_time_from_file= Long.parseLong(boot_time_s);
@@ -188,10 +200,11 @@ public class CpuSpyApp extends Application {
       // Differences less than the assumed boot cycle time
       // are assumed to be jitter and ignored.
       if (boot_time_from_file + min_boot_cycle_time < boot_time_millis()) {
-          // Ignore offsets since they apply to a previous boot.
-          return;
+         toast("Saved offsets apply to a previous boot, ignoring them.");
+         return;
       }
 
+      toast("Applying saved offsets...");
       // each offset seperated by commas
       String[] offsets = prefs.split (",");
       for (String offset : offsets) {
