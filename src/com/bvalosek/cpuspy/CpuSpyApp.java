@@ -14,6 +14,8 @@ package com.bvalosek.cpuspy;
 // imports
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import java.util.Collections;
@@ -38,6 +42,7 @@ public class CpuSpyApp extends Application {
    // used during settings save
    private static final String PREF_NAME = "cpuspy";
    private static final String PREF_OFFSETS = "cpuOffsets";
+   private static final String PREF_BOOT_TIME = "boot_time";
 
    /** offsets used if user reset */
    private Map<Integer, Integer> mOffsets = new HashMap<Integer, Integer>();
@@ -47,6 +52,12 @@ public class CpuSpyApp extends Application {
 
    /** kernel build string */
    private String mKernelString = "";
+
+   void toast(final String text) {
+      Log.d("cpuspy", text);
+      Context context= getApplicationContext();
+      Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+   }
 
    /** on startup */
    @Override public void onCreate () {
@@ -118,6 +129,7 @@ public class CpuSpyApp extends Application {
       updateTimeInStates ();
       mOffsets.clear ();
       saveOffsets ();
+      toast("Offsets cleared.");
    }
 
    /** update offsets to "reset" state times */
@@ -131,18 +143,68 @@ public class CpuSpyApp extends Application {
 
       // return states with offsets
       saveOffsets ();
+      toast("Offsets saved.");
       return getStates ();
    }
 
-   /** loads offset prefs */
+   /** @return Absolute time at last boot, in milliseconds since the
+       beginning of the epoch.  If the system time is modified, for
+       example using "setCurrentTimeMillis", the result will change in
+       the same way.
+
+       CAVEAT: Depending on timing and on the implementation of
+       System.currentTimeMillis() and SystemClock.elapsedRealtime(),
+       the return value of "boot_time_millis" should be expected to
+       jitter. In other words, subsequent calls to this function will
+       probably not all yield the same result.  This should be taken
+       into account when comparing values.
+
+       FIXME: Is there a more direct and stable method of determining
+       the absolute time at the last boot?  For example, is there a
+       boot log with a time stamp?
+
+       Note that milliseconds are not an appropriate unit here, since
+       accuracy of boot time is going to be on the order of seconds.
+       Seconds would be more appropriate. However, just reducing the
+       accuracy to seconds will still not eliminate the jitter.
+
+       Note that the return type of "currentTimeMillis" and
+       "elapsedRealTime" is "long", so their values can be expected to
+       never wrap.
+   */
+   static long boot_time_millis() {
+      return (System.currentTimeMillis() - SystemClock.elapsedRealtime());
+   }
+
+   /** Loads offset prefs.
+
+       If the system was rebooted after last writing offsets, the
+       offsets are ignored.
+   */
    public void loadOffsets () {
       SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
+      // FIXME: Check return value above.
       String prefs = settings.getString (PREF_OFFSETS, "");
-
       if (prefs == null || prefs.length() < 1) {
+         toast("No saved offsets found.");
          return;
       }
 
+      final String boot_time_s = settings.getString (PREF_BOOT_TIME, "");
+      if (null == boot_time_s || boot_time_s.length() < 1) {
+         toast("Saved offsets apply to an unknown boot time, ignoring them.");
+         return;
+      }
+      final long boot_time_from_file= Long.parseLong(boot_time_s);
+      final long min_boot_cycle_time= 30*1000; // msec
+      // Differences less than the assumed boot cycle time
+      // are assumed to be jitter and ignored.
+      if (boot_time_from_file + min_boot_cycle_time < boot_time_millis()) {
+         toast("Saved offsets apply to a previous boot, ignoring them.");
+         return;
+      }
+
+      toast("Applying saved offsets...");
       // each offset seperated by commas
       String[] offsets = prefs.split (",");
       for (String offset : offsets) {
@@ -154,7 +216,7 @@ public class CpuSpyApp extends Application {
 
    /** saves the offset prefs */
    public void saveOffsets () {
-      SharedPreferences settings = getSharedPreferences ("cpuspy", 0);
+      SharedPreferences settings = getSharedPreferences (PREF_NAME, 0);
       SharedPreferences.Editor editor = settings.edit ();
 
       // add each offset
@@ -164,7 +226,17 @@ public class CpuSpyApp extends Application {
       }
 
       // write the pref
-      editor.putString ("cpuOffsets", str);
+      /* We store the boot time instead of the current time because
+         the boot time is less likely to slip past the next boot time
+         by time adjustments.  If we were to store the current time,
+         the next boot time may be just a few seconds ahead. Because
+         shutdown takes just a few seconds, and it may also take only
+         a few seconds until elapsedRealTime begins to advance during
+         a reboot, time adjustments in the range of seconds can foil a
+         comparison of boot time with current time. In contrast, boot
+         times are usually at least minutes apart. */
+      editor.putString (PREF_BOOT_TIME, "" + boot_time_millis());
+      editor.putString (PREF_OFFSETS, str);
       editor.commit ();
    }
 
