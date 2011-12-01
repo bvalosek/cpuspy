@@ -1,8 +1,15 @@
 CPU Spy Changes
 ---------------
 
+v0.3.2 beta
+-Pulled in fix from Rainerd to help with percentage mixups after reboot
+
+v0.3.1 beta
+-Small fix that may help with freezing issues with some custom ROMS
+
 v0.3.0 beta
--Attempts to read time_in_state file as root in case reading is blocked by a custom ROM
+-Attempts to read time_in_state file as root in case reading is blocked by a
+custom ROM
 
 v0.2.2 beta
 -States are now sorted from highest to lowest frequency
