@@ -42,6 +42,9 @@ public class HomeActivity extends Activity
    /** additional states text */
    private TextView mUiAdditionalStates = null;
 
+   /** total state time text */
+   private TextView mUiTotalStateTime = null;
+
    /** additional states haeder */
    private TextView mUiHeaderAdditionalStates = null;
 
@@ -72,6 +75,7 @@ public class HomeActivity extends Activity
       mUiHeaderAdditionalStates = (TextView)findViewById (
          R.id.ui_header_additional_states);
       mUiStatesWarning = (TextView)findViewById (R.id.ui_states_warning);
+      mUiTotalStateTime = (TextView)findViewById(R.id.ui_total_state_time);
 
       // update title
       setTitle(getResources().getText(R.string.app_name) + " v" + 
@@ -110,6 +114,10 @@ public class HomeActivity extends Activity
       	mUiStatesWarning.setVisibility (View.VISIBLE);
       }
 
+      // total state time
+      int totTime = mApp.getTotalStateTime() / 100;
+      mUiTotalStateTime.setText(sToTime(totTime));
+
       // for all empty views, edit the additional line textview
       if (extraStates.size() > 0) {
          int n = 0;
@@ -141,6 +149,23 @@ public class HomeActivity extends Activity
       mApp.updateKernelString ();
    }
 
+    /** converts time in seconds to a nice string */
+    private static String sToTime(int tSec) {
+        int h = (int)Math.floor (tSec / (60*60) );
+        int m = (int)Math.floor ( (tSec - h*60*60) / 60);
+        int s = tSec % 60;
+        String sDur;
+        sDur = h + ":";
+        if (m < 10)
+            sDur += "0";
+        sDur += m + ":";
+        if (s < 10)
+        sDur += "0";
+        sDur += s;
+
+        return sDur;
+    }
+
    /** spit out a view representing a cpustate so we can cram it into a ScrollView */
    private View generateStateRow (CpuState state, ViewGroup parent) {
       // inflate the XML into a view in the parent
@@ -162,17 +187,7 @@ public class HomeActivity extends Activity
 
       // duration
       int tSec = state.duration / 100;
-      int h = (int)Math.floor (tSec / (60*60) );
-      int m = (int)Math.floor ( (tSec - h*60*60) / 60);
-      int s = tSec % 60;
-      String sDur;
-      sDur = h + ":";
-      if (m < 10)
-         sDur += "0";
-      sDur += m + ":";
-      if (s < 10)
-      	sDur += "0";
-      sDur += s;
+      String sDur = sToTime(tSec);
 
       // map UI elements to objects
       TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);

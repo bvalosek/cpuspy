@@ -29,6 +29,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ui_states_view"
+            android:paddingBottom="10dp"
          />
          
          <TextView
@@ -63,6 +64,24 @@
             android:padding="6dp"
          />
             
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:background="#222222"
+            android:text="Total State Time"
+         />
+
+         <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:textColor="#dddddd"
+            android:padding="7dp"
+            android:id="@+id/ui_total_state_time"
+            android:gravity="center_horizontal"
+         />
+
          <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
