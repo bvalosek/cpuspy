@@ -2,7 +2,32 @@ CPU Spy
 
 (c) 2011 Brandon Valosek <bvalosek@gmail.com>
 
-Simple app used to show time spent in each CPU state
+Simple Android app for viewing the time the CPU spends in each frequency state,
+as well as the current kernel information.
 
-Tested only on Samsung Galaxy S (AT&T Captivate), may work on other
-phones.
+=== TO INSTALL ===
+The latest stable version is available on the Android Market:
+
+   https://market.android.com/details?id=com.bvalosek.cpuspy
+
+=== TO BUILD ===
+To download the repo and build the APK signed with the SDK debug keys:
+   git clone git://github.com/storm717/cpuspy.git
+   cd cpuspy
+   ./init.sh
+   make build-debug
+
+=== TO CONTRIBUTE ===
+This project is open source, so feel free to fork the repo and make any changes
+you wish. You can then issue a pull request via GitHub (please insure your
+branch is up-to-date with the master via a git rebase).
+
+There is also a discussion thread on XDA Developers:
+
+   http://forum.xda-developers.com/showthread.php?t=1011497
+
+=== SPECIAL THANKS TO ===
+Rainer Blome <rainer.blome@gmx.de>
+
+=== LICENSE ===
+See the LICENSE file.
