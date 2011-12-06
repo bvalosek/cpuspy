@@ -1,158 +1,146 @@
 //-----------------------------------------------------------------------------
-// cpuspy
 //
-// (c) Brandon Valosek, 2011 <bvalosek@gmail.com>
+// (C) Brandon Valosek, 2011 <bvalosek@gmail.com>
 //
-// HomeActivity.java
-//
-// Main UI
 //-----------------------------------------------------------------------------
 
 package com.bvalosek.cpuspy.ui;
 
-// my stuff
-import com.bvalosek.cpuspy.*;
-import com.bvalosek.cpuspy.CpuSpyApp.CpuState;
-
 // imports
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
-import android.os.Bundle;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.ProgressBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import java.util.List;
-import java.util.ArrayList;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.bvalosek.cpuspy.*;
+import com.bvalosek.cpuspy.CpuStateMonitor.CpuState;
+import com.bvalosek.cpuspy.CpuStateMonitor.CpuStateMonitorException;
 
 /** main activity class */
 public class HomeActivity extends Activity
 {
-   /** talk to the app */
-   private CpuSpyApp mApp = null;
+    private CpuSpyApp _app = null;
 
-   /** where we dump the states views */
-   private LinearLayout mUiStatesView = null;
+    // the views
+    private LinearLayout    _uiStatesView = null;
+    private TextView        _uiAdditionalStates = null;
+    private TextView        _uiTotalStateTime = null;
+    private TextView        _uiHeaderAdditionalStates = null;
+    private TextView        _uiStatesWarning = null;
+    private TextView        _uiKernelString = null;
 
-   /** additional states text */
-   private TextView mUiAdditionalStates = null;
+    /** Initialize the Activity */
+    @Override public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
 
-   /** total state time text */
-   private TextView mUiTotalStateTime = null;
+        // inflate the view, stash the app context, and get all UI elements
+        setContentView(R.layout.home_layout);
+        _app = (CpuSpyApp)getApplicationContext();
+        findViews();
 
-   /** additional states haeder */
-   private TextView mUiHeaderAdditionalStates = null;
+        // set title to version string
+        setTitle(getResources().getText(R.string.app_name) + " v" +
+        getResources().getText(R.string.version_name));
 
-   /** warning for no states */
-   private TextView mUiStatesWarning = null;
+        updateData();
+    }
 
-   /** kernel string */
-   private TextView mUiKernelString = null; 
+    /** Update the view when the application regains focus */
+    @Override public void onResume () {
+        super.onResume();
+        updateView();
+    }
 
-   /** what to call CPU off state */
-   private static final String STR_SLEEP_STATE = "Deep Sleep";
+    /** Map all of the UI elements to member variables */
+    private void findViews() {
+        _uiStatesView = (LinearLayout)findViewById(R.id.ui_states_view);
+        _uiKernelString = (TextView)findViewById(R.id.ui_kernel_string);
+        _uiAdditionalStates = (TextView)findViewById(
+                R.id.ui_additional_states);
+        _uiHeaderAdditionalStates =(TextView)findViewById(
+                R.id.ui_header_additional_states);
+        _uiStatesWarning = (TextView)findViewById(R.id.ui_states_warning);
+        _uiTotalStateTime = (TextView)findViewById(R.id.ui_total_state_time);
+    }
 
-   /** Called when the activity is first created. */
-   @Override public void onCreate(Bundle savedInstanceState)
-   {
-      super.onCreate(savedInstanceState);
-
-      // inflate the view
-      setContentView(R.layout.home_layout);
-
-      // get app context
-      mApp = (CpuSpyApp)getApplicationContext ();
-
-      // find views
-      mUiStatesView = (LinearLayout)findViewById (R.id.ui_states_view);
-      mUiKernelString = (TextView)findViewById (R.id.ui_kernel_string);
-      mUiAdditionalStates = (TextView)findViewById (R.id.ui_additional_states);
-      mUiHeaderAdditionalStates = (TextView)findViewById (
-         R.id.ui_header_additional_states);
-      mUiStatesWarning = (TextView)findViewById (R.id.ui_states_warning);
-      mUiTotalStateTime = (TextView)findViewById(R.id.ui_total_state_time);
-
-      // update title
-      setTitle(getResources().getText(R.string.app_name) + " v" + 
-         getResources().getText(R.string.version_name) );
-
-      // draw all the info
-      updateData ();
-   }
-
-   /** resume */
-   @Override public void onResume () {
-      super.onResume ();
-      updateView ();
-   }
-
-   /** update the view */
-   public void updateView () {
-      /* fill up the layout with views for the states, recording which ones
-       * are empty */
-      mUiStatesView.removeAllViews();
-      List<String> extraStates = new ArrayList<String> ();
-      for (CpuState state : mApp.getStates () ) {
-         if (state.duration > 0) {
-            generateStateRow (state, mUiStatesView);
-         } else {
-            if (state.freq == 0) {
-            	extraStates.add (STR_SLEEP_STATE);
+    /** Generate and update all UI elements */
+    public void updateView() {
+        /** Get the CpuStateMonitor from the app, and iterate over all states,
+         * creating a row if the duration is > 0 or otherwise marking it in
+         * extraStates (missing) */
+        CpuStateMonitor monitor = _app.getCpuStateMonitor();
+        _uiStatesView.removeAllViews();
+        List<String> extraStates = new ArrayList<String>();
+        for (CpuState state : monitor.getStates()) {
+            if (state.duration > 0) {
+                generateStateRow(state, _uiStatesView);
             } else {
-               extraStates.add (state.freq/1000 + " MHz");
+                if (state.freq == 0) {
+                    extraStates.add("Deep Sleep");
+                } else {
+                    extraStates.add(state.freq/1000 + " MHz");
+                }
             }
-         }
-      }
+        }
 
-      // no states?!
-      if ( mApp.getStates().size() == 0) {
-      	mUiStatesWarning.setVisibility (View.VISIBLE);
-      }
+        // show the red warning label if no states found
+        if ( monitor.getStates().size() == 0) {
+            _uiStatesWarning.setVisibility(View.VISIBLE);
+        }
 
-      // total state time
-      int totTime = mApp.getTotalStateTime() / 100;
-      mUiTotalStateTime.setText(sToTime(totTime));
+        // update the total state time
+        int totTime = monitor.getTotalStateTime() / 100;
+        _uiTotalStateTime.setText(sToString(totTime));
 
-      // for all empty views, edit the additional line textview
-      if (extraStates.size() > 0) {
-         int n = 0;
-         String str = ""; 
-         // construct nice looking comma-seperated list
-         for (String s : extraStates) {
-            if (n++ > 0)
-               str += ", ";
-            str += s;
-         }
-         mUiAdditionalStates.setVisibility(View.VISIBLE);
-         mUiHeaderAdditionalStates.setVisibility (View.VISIBLE);
-         mUiAdditionalStates.setText (str);
-      } else {
-      	mUiAdditionalStates.setVisibility(View.GONE);
-      	mUiHeaderAdditionalStates.setVisibility(View.GONE);
-      }
+        // for all the 0 duration states, add the the Unused State area
+        if (extraStates.size() > 0) {
+            int n = 0;
+            String str = "";
 
-      // kernel line
-      mUiKernelString.setText ( mApp.getKernelString () );
-   }
+            for (String s : extraStates) {
+                if (n++ > 0)
+                    str += ", ";
+                str += s;
+            }
 
-   /** update the data */
-   public void updateData () {
-      // get the time spent in states
-      mApp.updateTimeInStates ();
-      
-      // from /proc/version
-      mApp.updateKernelString ();
-   }
+            _uiAdditionalStates.setVisibility(View.VISIBLE);
+            _uiHeaderAdditionalStates.setVisibility(View.VISIBLE);
+            _uiAdditionalStates.setText(str);
+        } else {
+            _uiAdditionalStates.setVisibility(View.GONE);
+            _uiHeaderAdditionalStates.setVisibility(View.GONE);
+        }
 
-    /** converts time in seconds to a nice string */
-    private static String sToTime(int tSec) {
-        int h = (int)Math.floor (tSec / (60*60) );
-        int m = (int)Math.floor ( (tSec - h*60*60) / 60);
+        // kernel line
+        _uiKernelString.setText( _app.getKernelVersion());
+    }
+
+    /** Attempt to update the time-in-state info */
+    public void updateData() {
+        CpuStateMonitor monitor = _app.getCpuStateMonitor();
+        try {
+            monitor.updateStates();
+        } catch (CpuStateMonitorException e) {
+            // TODO: log error and maybe show user a warning
+        }
+    }
+
+    /** @return A nicely formatted String representing tSec seconds */
+    private static String sToString(int tSec) {
+        int h = (int)Math.floor(tSec / (60*60));
+        int m = (int)Math.floor((tSec - h*60*60) / 60);
         int s = tSec % 60;
         String sDur;
         sDur = h + ":";
@@ -160,85 +148,92 @@ public class HomeActivity extends Activity
             sDur += "0";
         sDur += m + ":";
         if (s < 10)
-        sDur += "0";
+            sDur += "0";
         sDur += s;
 
         return sDur;
     }
 
-   /** spit out a view representing a cpustate so we can cram it into a ScrollView */
-   private View generateStateRow (CpuState state, ViewGroup parent) {
-      // inflate the XML into a view in the parent
-      LayoutInflater inf = LayoutInflater.from ( (Context)mApp );
-      LinearLayout theRow = (LinearLayout)inf.inflate(
-         R.layout.state_row, parent, false);
+    /**
+     * @return a View that correpsonds to a CPU freq state row as specified
+     * by the state parameter
+     */
+    private View generateStateRow(CpuState state, ViewGroup parent) {
+        // inflate the XML into a view in the parent
+        LayoutInflater inf = LayoutInflater.from((Context)_app );
+        LinearLayout theRow = (LinearLayout)inf.inflate(
+                R.layout.state_row, parent, false);
 
-      // what percetnage we've got
-      float per = (float)state.duration * 100 / mApp.getTotalStateTime (); 
-      String sPer = (int)per + "%";
-      
-      // state name
-      String sFreq;
-      if (state.freq == 0) {
-      	sFreq = STR_SLEEP_STATE;
-      } else {
-         sFreq = state.freq / 1000 + " MHz";
-      } 
+        // what percetnage we've got
+        CpuStateMonitor monitor = _app.getCpuStateMonitor();
+        float per = (float)state.duration * 100 /
+            monitor.getTotalStateTime();
+        String sPer = (int)per + "%";
 
-      // duration
-      int tSec = state.duration / 100;
-      String sDur = sToTime(tSec);
+        // state name
+        String sFreq;
+        if (state.freq == 0) {
+            sFreq = "Deep Sleep";
+        } else {
+            sFreq = state.freq / 1000 + " MHz";
+        }
 
-      // map UI elements to objects
-      TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);
-      TextView durText = (TextView)theRow.findViewById(R.id.ui_duration_text);
-      TextView perText = (TextView)theRow.findViewById(R.id.ui_percentage_text);
-      ProgressBar bar = (ProgressBar)theRow.findViewById(R.id.ui_bar);
+        // duration
+        int tSec = state.duration / 100;
+        String sDur = sToString(tSec);
 
-      // modify the row
-      freqText.setText (sFreq);
-      perText.setText (sPer);
-      durText.setText (sDur);
-      bar.setProgress ( (int)per);
+        // map UI elements to objects
+        TextView freqText = (TextView)theRow.findViewById(R.id.ui_freq_text);
+        TextView durText = (TextView)theRow.findViewById(
+                R.id.ui_duration_text);
+        TextView perText = (TextView)theRow.findViewById(
+                R.id.ui_percentage_text);
+        ProgressBar bar = (ProgressBar)theRow.findViewById(R.id.ui_bar);
 
-      // add it to parent and return
-      parent.addView(theRow);
-   	return theRow;
-   }
+        // modify the row
+        freqText.setText(sFreq);
+        perText.setText(sPer);
+        durText.setText(sDur);
+        bar.setProgress((int)per);
 
-
-   /** called when we want to infalte the menu */
-   @Override public boolean onCreateOptionsMenu (Menu menu) {
-      // request inflater from activity and inflate into its menu
-      MenuInflater inflater = getMenuInflater ();
-      inflater.inflate (R.menu.home_menu, menu);
-
-      // made it
-      return true;
-   }
-
-   /** called to handle a menu event */
-   @Override public boolean onOptionsItemSelected (MenuItem item) {
-      // what it do mayne
-      switch (item.getItemId () ) {
-      /* pressed the load menu button */
-      case R.id.menu_refresh:
-         updateData ();
-         updateView ();
-         break;
-      case R.id.menu_reset:
-         mApp.resetStates();
-         updateView();
-      	break;
-      case R.id.menu_restore:
-         mApp.restoreStates ();
-         updateView ();
-         break;
-      }
-
-      // made it
-      return true;
-   }
+        // add it to parent and return
+        parent.addView(theRow);
+        return theRow;
+    }
 
 
+    /** called when we want to infalte the menu */
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        // request inflater from activity and inflate into its menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.home_menu, menu);
+
+        // made it
+        return true;
+    }
+
+    /** called to handle a menu event */
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        // what it do mayne
+        switch (item.getItemId()) {
+        /* pressed the load menu button */
+        case R.id.menu_refresh:
+            updateData();
+            updateView();
+            break;
+        case R.id.menu_reset:
+            _app.getCpuStateMonitor().setOffsets();
+            _app.saveOffsets();
+            updateView();
+            break;
+        case R.id.menu_restore:
+            _app.getCpuStateMonitor().removeOffsets();
+            _app.saveOffsets();
+            updateView();
+            break;
+        }
+
+        // made it
+        return true;
+    }
 }

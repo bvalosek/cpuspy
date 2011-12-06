@@ -62,13 +62,8 @@ public class CpuStateMonitor {
         }
     }
 
-    /** @return List of CpuState of the CPU */
-    public List<CpuState> getTimeInStates() {
-        return _states;
-    }
-
     /** @return List of CpuState with the offsets applied */
-    public List<CpuState> getTimeInStatesWithOffsets() {
+    public List<CpuState> getStates() {
         List<CpuState> states = new ArrayList<CpuState>();
 
         /* check for an existing offset, and if it's not too big, subtract it
@@ -77,8 +72,14 @@ public class CpuStateMonitor {
             int duration = state.duration;
             if (_offsets.containsKey(state.freq)) {
                 int offset = _offsets.get(state.freq);
-                if (offset < duration) {
+                if (offset <= duration) {
                     duration -= offset;
+                } else {
+                    /* offset > duration implies our offsets are now invalid,
+                     * so clear and recall this function */
+                    _offsets.clear();
+                    Log.i(TAG, "Stale offsets, reset");
+                    return getStates();
                 }
             }
 
@@ -88,36 +89,37 @@ public class CpuStateMonitor {
         return states;
     }
 
-    /** @return Sum of all state durations, including deep sleep */
+    /**
+     * @return Sum of all state durations including deep sleep, accounting
+     * for offsets
+     */
     public int getTotalStateTime() {
         int sum = 0;
+        int offset = 0;
 
         for (CpuState state : _states) {
             sum += state.duration;
         }
 
-        return sum;
+        for (Map.Entry<Integer, Integer> entry : _offsets.entrySet()) {
+            offset += entry.getValue();
+        }
+
+        return sum - offset;
     }
 
     /**
-     * @return Sum of all state durations including deep sleep, accounting
-     * for offsets
+     * @return Map of freq->duration of all the offsets
      */
-    public int getTotalStateTimeIncludingOffsets() {
-        int sum = 0;
-
-        for (Map.Entry<Integer, Integer> entry : _offsets.entrySet()) {
-            sum += entry.getValue();
-        }
-
-        return getTotalStateTime() - sum;
+    public Map<Integer, Integer> getOffsets() {
+        return _offsets;
     }
 
     /**
      * Sets the offset map (freq->duration offset), used to allowing the
      * user to "reset" the state timers"
      */
-    public void setStateOffests(Map<Integer, Integer> offsets) {
+    public void setOffsets(Map<Integer, Integer> offsets) {
         _offsets = offsets;
     }
 
@@ -125,9 +127,15 @@ public class CpuStateMonitor {
      * Updates the current time in states and then sets the offset map to the
      * current duration, effectively "zeroing out" the timers
      */
-    public void setStateOffsets() throws CpuStateMonitorException {
+    public void setOffsets() {
         _offsets.clear();
-        updateTimeInStates();
+
+        try {
+            updateStates();
+        } catch (CpuStateMonitorException e) {
+            Log.e(TAG, "Tried to set offsets when unable to update states");
+        }
+
         for (CpuState state : _states) {
             _offsets.put(state.freq, state.duration);
         }
@@ -142,7 +150,7 @@ public class CpuStateMonitor {
      * @return a list of all the CPU frequency states, which contains
      * both a frequency and a duration (time spent in that state
      */
-    public List<CpuState> updateTimeInStates()
+    public List<CpuState> updateStates()
         throws CpuStateMonitorException {
         /* attempt to create a buffered reader to the time in state
          * file and read in the states to the class */
@@ -150,6 +158,7 @@ public class CpuStateMonitor {
             InputStream is = new FileInputStream(TIME_IN_STATE_PATH);
             InputStreamReader ir = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(ir);
+            _states.clear();
             readInStates(br);
             is.close();
         } catch (IOException e) {
@@ -174,7 +183,6 @@ public class CpuStateMonitor {
     private void readInStates(BufferedReader br)
         throws CpuStateMonitorException {
         try {
-            _states.clear();
             String line;
             while ((line = br.readLine()) != null) {
                 // split open line and convert to Integers
