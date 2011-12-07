@@ -9,4 +9,4 @@
 android update project \
     -p . \
     -n cpuspy \
-    -t android-8
+    -t android-14
