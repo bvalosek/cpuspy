@@ -101,7 +101,7 @@ public class HomeActivity extends Activity
         }
 
         // update the total state time
-        int totTime = monitor.getTotalStateTime() / 100;
+        long totTime = monitor.getTotalStateTime() / 100;
         _uiTotalStateTime.setText(sToString(totTime));
 
         // for all the 0 duration states, add the the Unused State area
@@ -138,10 +138,10 @@ public class HomeActivity extends Activity
     }
 
     /** @return A nicely formatted String representing tSec seconds */
-    private static String sToString(int tSec) {
-        int h = (int)Math.floor(tSec / (60*60));
-        int m = (int)Math.floor((tSec - h*60*60) / 60);
-        int s = tSec % 60;
+    private static String sToString(long tSec) {
+        long h = (long)Math.floor(tSec / (60*60));
+        long m = (long)Math.floor((tSec - h*60*60) / 60);
+        long s = tSec % 60;
         String sDur;
         sDur = h + ":";
         if (m < 10)
@@ -179,7 +179,7 @@ public class HomeActivity extends Activity
         }
 
         // duration
-        int tSec = state.duration / 100;
+        long tSec = state.duration / 100;
         String sDur = sToString(tSec);
 
         // map UI elements to objects

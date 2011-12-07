@@ -35,7 +35,7 @@ public class CpuStateMonitor {
     private static final String TAG = "CpuStateMonitor";
 
     private List<CpuState> _states = new ArrayList<CpuState>();
-    private Map<Integer, Integer> _offsets = new HashMap<Integer, Integer>();
+    private Map<Integer, Long> _offsets = new HashMap<Integer, Long>();
 
     /** exception class */
     public class CpuStateMonitorException extends Exception {
@@ -49,10 +49,10 @@ public class CpuStateMonitor {
      */
     public class CpuState implements Comparable<CpuState> {
         /** init with freq and duration */
-        public CpuState(int a, int b) { freq = a; duration = b; }
+        public CpuState(int a, long b) { freq = a; duration = b; }
 
         public int freq = 0;
-        public int duration = 0;
+        public long duration = 0;
 
         /** for sorting, compare the freqs */
         public int compareTo(CpuState state) {
@@ -69,9 +69,9 @@ public class CpuStateMonitor {
         /* check for an existing offset, and if it's not too big, subtract it
          * from the duration, otherwise just add it to the return List */
         for (CpuState state : _states) {
-            int duration = state.duration;
+            long duration = state.duration;
             if (_offsets.containsKey(state.freq)) {
-                int offset = _offsets.get(state.freq);
+                long offset = _offsets.get(state.freq);
                 if (offset <= duration) {
                     duration -= offset;
                 } else {
@@ -93,15 +93,15 @@ public class CpuStateMonitor {
      * @return Sum of all state durations including deep sleep, accounting
      * for offsets
      */
-    public int getTotalStateTime() {
-        int sum = 0;
-        int offset = 0;
+    public long getTotalStateTime() {
+        long sum = 0;
+        long offset = 0;
 
         for (CpuState state : _states) {
             sum += state.duration;
         }
 
-        for (Map.Entry<Integer, Integer> entry : _offsets.entrySet()) {
+        for (Map.Entry<Integer, Long> entry : _offsets.entrySet()) {
             offset += entry.getValue();
         }
 
@@ -111,7 +111,7 @@ public class CpuStateMonitor {
     /**
      * @return Map of freq->duration of all the offsets
      */
-    public Map<Integer, Integer> getOffsets() {
+    public Map<Integer, Long> getOffsets() {
         return _offsets;
     }
 
@@ -119,7 +119,7 @@ public class CpuStateMonitor {
      * Sets the offset map (freq->duration offset), used to allowing the
      * user to "reset" the state timers"
      */
-    public void setOffsets(Map<Integer, Integer> offsets) {
+    public void setOffsets(Map<Integer, Long> offsets) {
         _offsets = offsets;
     }
 
@@ -168,7 +168,7 @@ public class CpuStateMonitor {
 
         /* deep sleep time determined by difference between elapsed
          * (total) boot time and the system uptime (awake) */
-        int sleepTime = (int)(SystemClock.elapsedRealtime()
+        long sleepTime = (SystemClock.elapsedRealtime()
                 - SystemClock.uptimeMillis()) / 10;
         _states.add(new CpuState(0, sleepTime));
 
@@ -189,7 +189,7 @@ public class CpuStateMonitor {
                 String[] nums = line.split(" ");
                 _states.add(new CpuState(
                         Integer.parseInt(nums[0]),
-                        Integer.parseInt(nums[1])));
+                        Long.parseLong(nums[1])));
             }
         } catch (IOException e) {
             throw new CpuStateMonitorException(
