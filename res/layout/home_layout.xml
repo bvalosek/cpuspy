@@ -5,106 +5,93 @@
     android:layout_height="fill_parent"
     >
 
-   <ScrollView
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-   >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
 
-      <LinearLayout
-         android:layout_width="fill_parent"
-         android:layout_height="fill_parent"
-         android:orientation="vertical" 
-
-      >
-         <TextView
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="#222222"
-            android:padding="3dp"
-            android:text="Time In State"
-         />
-
-         <LinearLayout
+            android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ui_states_view"
-            android:paddingBottom="10dp"
-         />
-         
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:textColor="#ffffff"
-            android:textSize="20dp"
-            android:background="#551111"
-            android:text="No states file found. Are you sure your phone is compatible?"
-            android:visibility="gone"
-            android:id="@+id/ui_states_warning"
-         />
+            >
+
+            <TextView
+                style="@style/infoHeader"
+                android:text="Time In State"
+                />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ui_states_view"
+                android:paddingBottom="10dp"
+                />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:textColor="#ffffff"
+                android:textSize="20dp"
+                android:background="#551111"
+                android:text="No states file found. Are you sure your phone is compatible?\n\nIf you are running a custom ROM or kernel, try contacting its developer to inform him that the states file is not readable."
+                android:visibility="gone"
+                android:id="@+id/ui_states_warning"
+                />
 
 
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
-            android:background="#222222"
-            android:visibility="gone"
-            android:id="@+id/ui_header_additional_states"
-            android:padding="3dp"
-            android:text="Unused CPU states"
-         />
+            <TextView
+                android:id="@+id/ui_header_additional_states"
+                style="@style/infoHeader"
+                android:visibility="gone"
+                android:text="Unused CPU states"
+                />
 
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:id="@+id/ui_additional_states"
-            android:padding="6dp"
-         />
-            
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:background="#222222"
-            android:text="Total State Time"
-         />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:id="@+id/ui_additional_states"
+                android:padding="6dp"
+                />
 
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textSize="25dp"
-            android:textColor="#dddddd"
-            android:padding="7dp"
-            android:id="@+id/ui_total_state_time"
-            android:gravity="center_horizontal"
-         />
+            <TextView
+                android:id="@+id/ui_header_total_state_time"
+                style="@style/infoHeader"
+                android:text="Total State Time"
+                />
 
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:background="#222222"
-            android:text="Kernel Info"
-         />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="25dp"
+                android:textColor="#dddddd"
+                android:padding="7dp"
+                android:id="@+id/ui_total_state_time"
+                android:gravity="center_horizontal"
+                />
+
+            <TextView
+                style="@style/infoHeader"
+                android:text="Kernel Info"
+                />
 
 
-         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Kernel"
-            android:textSize="19dp"
-            android:textColor="#dddddd"
-            android:padding="10dp"
-            android:id="@+id/ui_kernel_string"
-         />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Kernel"
+                android:textSize="19dp"
+                android:textColor="#dddddd"
+                android:padding="10dp"
+                android:id="@+id/ui_kernel_string"
+                />
 
-      </LinearLayout>
+        </LinearLayout>
 
-
-   </ScrollView>
+    </ScrollView>
 
 </LinearLayout>
 

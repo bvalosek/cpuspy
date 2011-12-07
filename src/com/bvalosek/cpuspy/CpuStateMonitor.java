@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.os.SystemClock;
-import android.util.Log;
 
 /**
  * CpuStateMonitor is a class responsible for querying the system and getting
@@ -30,12 +29,11 @@ public class CpuStateMonitor {
 
     public static final String TIME_IN_STATE_PATH =
         "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
-    public static final String VERSION_PATH = "/proc/version";
 
     private static final String TAG = "CpuStateMonitor";
 
-    private List<CpuState> _states = new ArrayList<CpuState>();
-    private Map<Integer, Long> _offsets = new HashMap<Integer, Long>();
+    private List<CpuState>      _states = new ArrayList<CpuState>();
+    private Map<Integer, Long>  _offsets = new HashMap<Integer, Long>();
 
     /** exception class */
     public class CpuStateMonitorException extends Exception {
@@ -78,7 +76,6 @@ public class CpuStateMonitor {
                     /* offset > duration implies our offsets are now invalid,
                      * so clear and recall this function */
                     _offsets.clear();
-                    Log.i(TAG, "Stale offsets, reset");
                     return getStates();
                 }
             }
@@ -115,10 +112,7 @@ public class CpuStateMonitor {
         return _offsets;
     }
 
-    /**
-     * Sets the offset map (freq->duration offset), used to allowing the
-     * user to "reset" the state timers"
-     */
+    /** Sets the offset map (freq->duration offset) */
     public void setOffsets(Map<Integer, Long> offsets) {
         _offsets = offsets;
     }
@@ -127,14 +121,9 @@ public class CpuStateMonitor {
      * Updates the current time in states and then sets the offset map to the
      * current duration, effectively "zeroing out" the timers
      */
-    public void setOffsets() {
+    public void setOffsets() throws CpuStateMonitorException {
         _offsets.clear();
-
-        try {
-            updateStates();
-        } catch (CpuStateMonitorException e) {
-            Log.e(TAG, "Tried to set offsets when unable to update states");
-        }
+        updateStates();
 
         for (CpuState state : _states) {
             _offsets.put(state.freq, state.duration);

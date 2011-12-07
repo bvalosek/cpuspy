@@ -37,6 +37,7 @@ public class HomeActivity extends Activity
     private TextView        _uiAdditionalStates = null;
     private TextView        _uiTotalStateTime = null;
     private TextView        _uiHeaderAdditionalStates = null;
+    private TextView        _uiHeaderTotalStateTime = null;
     private TextView        _uiStatesWarning = null;
     private TextView        _uiKernelString = null;
 
@@ -69,10 +70,52 @@ public class HomeActivity extends Activity
         _uiKernelString = (TextView)findViewById(R.id.ui_kernel_string);
         _uiAdditionalStates = (TextView)findViewById(
                 R.id.ui_additional_states);
-        _uiHeaderAdditionalStates =(TextView)findViewById(
+        _uiHeaderAdditionalStates = (TextView)findViewById(
                 R.id.ui_header_additional_states);
+        _uiHeaderTotalStateTime = (TextView)findViewById(
+                R.id.ui_header_total_state_time);
         _uiStatesWarning = (TextView)findViewById(R.id.ui_states_warning);
         _uiTotalStateTime = (TextView)findViewById(R.id.ui_total_state_time);
+    }
+
+    /** called when we want to infalte the menu */
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        // request inflater from activity and inflate into its menu
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.home_menu, menu);
+
+        // made it
+        return true;
+    }
+
+    /** called to handle a menu event */
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        // what it do mayne
+        switch (item.getItemId()) {
+        /* pressed the load menu button */
+        case R.id.menu_refresh:
+            updateData();
+            updateView();
+            break;
+        case R.id.menu_reset:
+            try {
+                _app.getCpuStateMonitor().setOffsets();
+            } catch (CpuStateMonitorException e) {
+                // TODO: something
+            }
+
+            _app.saveOffsets();
+            updateView();
+            break;
+        case R.id.menu_restore:
+            _app.getCpuStateMonitor().removeOffsets();
+            _app.saveOffsets();
+            updateView();
+            break;
+        }
+
+        // made it
+        return true;
     }
 
     /** Generate and update all UI elements */
@@ -98,6 +141,9 @@ public class HomeActivity extends Activity
         // show the red warning label if no states found
         if ( monitor.getStates().size() == 0) {
             _uiStatesWarning.setVisibility(View.VISIBLE);
+            _uiHeaderTotalStateTime.setVisibility(View.GONE);
+            _uiTotalStateTime.setVisibility(View.GONE);
+            _uiStatesView.setVisibility(View.GONE);
         }
 
         // update the total state time
@@ -124,7 +170,7 @@ public class HomeActivity extends Activity
         }
 
         // kernel line
-        _uiKernelString.setText( _app.getKernelVersion());
+        _uiKernelString.setText(_app.getKernelVersion());
     }
 
     /** Attempt to update the time-in-state info */
@@ -160,7 +206,7 @@ public class HomeActivity extends Activity
      */
     private View generateStateRow(CpuState state, ViewGroup parent) {
         // inflate the XML into a view in the parent
-        LayoutInflater inf = LayoutInflater.from((Context)_app );
+        LayoutInflater inf = LayoutInflater.from((Context)_app);
         LinearLayout theRow = (LinearLayout)inf.inflate(
                 R.layout.state_row, parent, false);
 
@@ -199,41 +245,5 @@ public class HomeActivity extends Activity
         // add it to parent and return
         parent.addView(theRow);
         return theRow;
-    }
-
-
-    /** called when we want to infalte the menu */
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        // request inflater from activity and inflate into its menu
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.home_menu, menu);
-
-        // made it
-        return true;
-    }
-
-    /** called to handle a menu event */
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        // what it do mayne
-        switch (item.getItemId()) {
-        /* pressed the load menu button */
-        case R.id.menu_refresh:
-            updateData();
-            updateView();
-            break;
-        case R.id.menu_reset:
-            _app.getCpuStateMonitor().setOffsets();
-            _app.saveOffsets();
-            updateView();
-            break;
-        case R.id.menu_restore:
-            _app.getCpuStateMonitor().removeOffsets();
-            _app.saveOffsets();
-            updateView();
-            break;
-        }
-
-        // made it
-        return true;
     }
 }

@@ -20,7 +20,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.bvalosek.cpuspy.CpuStateMonitor.CpuState;
-import com.bvalosek.cpuspy.CpuStateMonitor.CpuState;
+import com.bvalosek.cpuspy.CpuStateMonitor.CpuStateMonitorException;
 
 /** main application class */
 public class CpuSpyApp extends Application {
@@ -58,7 +58,7 @@ public class CpuSpyApp extends Application {
 
     /**
      * Load the saved string of offsets from preferences and put it into
-     * the state monitori
+     * the state monitor
      */
     public void loadOffsets() {
         SharedPreferences settings = getSharedPreferences(
@@ -66,11 +66,8 @@ public class CpuSpyApp extends Application {
         String prefs = settings.getString (PREF_OFFSETS, "");
 
         if (prefs == null || prefs.length() < 1) {
-            Log.i(TAG, "No saved offsets found");
             return;
         }
-
-        Log.d(TAG, "Offsets found: " + prefs);
 
         // split the string by peroids and then the info by commas and load
         Map<Integer, Long> offsets = new HashMap<Integer, Long>();
@@ -100,7 +97,6 @@ public class CpuSpyApp extends Application {
             str += entry.getKey() + " " + entry.getValue() + ",";
         }
 
-        Log.d(TAG, "Saving offset: " + str);
         editor.putString(PREF_OFFSETS, str);
         editor.commit();
     }
