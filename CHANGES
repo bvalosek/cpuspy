@@ -7,6 +7,7 @@ v0.4.0 beta
 -Fix duration overflow bug
 -Removed read-as-root attempt when unable to access states file due to
 instability
+-Slightly improved tablet support
 
 v0.3.2 beta
 -Pulled in fix from Rainerd to help with percentage mixups after reboot

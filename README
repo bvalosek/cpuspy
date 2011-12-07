@@ -17,6 +17,12 @@ To download the repo and build the APK signed with the SDK debug keys:
    ./init.sh
    make build-debug
 
+=== INCOMPATIBLE PHONES ===
+The following phones do not seem to expose the necessary file to read in
+states:
+
+HTC Sensation XE, LG G2x
+
 === TO CONTRIBUTE ===
 This project is open source, so feel free to fork the repo and make any changes
 you wish. You can then issue a pull request via GitHub (please insure your
@@ -25,6 +31,10 @@ branch is up-to-date with the master via a git rebase).
 There is also a discussion thread on XDA Developers:
 
    http://forum.xda-developers.com/showthread.php?t=1011497
+
+To help diagnose problems with reading the state file, see this post on XDA:
+
+   http://forum.xda-developers.com/showpost.php?p=20087033&postcount=134
 
 === SPECIAL THANKS TO ===
 Rainer Blome <rainer.blome@gmx.de>
