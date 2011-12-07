@@ -1,6 +1,13 @@
 CPU Spy Changes
 ---------------
 
+v0.4.0 beta
+-Display total state time
+-Massive code cleanup
+-Fix duration overflow bug
+-Removed read-as-root attempt when unable to access states file due to
+instability
+
 v0.3.2 beta
 -Pulled in fix from Rainerd to help with percentage mixups after reboot
 
