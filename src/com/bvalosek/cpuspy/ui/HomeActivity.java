@@ -12,6 +12,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,10 +27,13 @@ import android.widget.TextView;
 import com.bvalosek.cpuspy.*;
 import com.bvalosek.cpuspy.CpuStateMonitor.CpuState;
 import com.bvalosek.cpuspy.CpuStateMonitor.CpuStateMonitorException;
+import android.util.Log;
 
 /** main activity class */
 public class HomeActivity extends Activity
 {
+    private static final String TAG = "CpuSpy";
+
     private CpuSpyApp _app = null;
 
     // the views
@@ -40,6 +44,9 @@ public class HomeActivity extends Activity
     private TextView        _uiHeaderTotalStateTime = null;
     private TextView        _uiStatesWarning = null;
     private TextView        _uiKernelString = null;
+
+    /** whether or not we're updating the data in the background */
+    private boolean     _updatingData = false;
 
     /** Initialize the Activity */
     @Override public void onCreate(Bundle savedInstanceState)
@@ -55,13 +62,23 @@ public class HomeActivity extends Activity
         setTitle(getResources().getText(R.string.app_name) + " v" +
         getResources().getText(R.string.version_name));
 
-        updateData();
+        // see if we're updating data during a config change (rotate screen)
+        if (savedInstanceState != null) {
+            _updatingData = savedInstanceState.getBoolean("updatingData");
+        }
     }
+
+    /** When the activity is about to change orientation */
+    @Override public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("updatingData", _updatingData);
+    }
+
 
     /** Update the view when the application regains focus */
     @Override public void onResume () {
         super.onResume();
-        updateView();
+        refreshData();
     }
 
     /** Map all of the UI elements to member variables */
@@ -94,8 +111,7 @@ public class HomeActivity extends Activity
         switch (item.getItemId()) {
         /* pressed the load menu button */
         case R.id.menu_refresh:
-            updateData();
-            updateView();
+            refreshData();
             break;
         case R.id.menu_reset:
             try {
@@ -174,12 +190,9 @@ public class HomeActivity extends Activity
     }
 
     /** Attempt to update the time-in-state info */
-    public void updateData() {
-        CpuStateMonitor monitor = _app.getCpuStateMonitor();
-        try {
-            monitor.updateStates();
-        } catch (CpuStateMonitorException e) {
-            // TODO: log error and maybe show user a warning
+    public void refreshData() {
+        if (!_updatingData) {
+            new RefreshStateDataTask().execute((Void)null);
         }
     }
 
@@ -245,5 +258,39 @@ public class HomeActivity extends Activity
         // add it to parent and return
         parent.addView(theRow);
         return theRow;
+    }
+
+    /** Keep updating the state data off the UI thread for slow devices */
+    protected class RefreshStateDataTask extends AsyncTask<Void, Void, Void> {
+
+        /** Stuff to do on a seperate thread */
+        @Override protected Void doInBackground(Void... v) {
+            CpuStateMonitor monitor = _app.getCpuStateMonitor();
+            try {
+                monitor.updateStates();
+            } catch (CpuStateMonitorException e) {
+                Log.e(TAG, "Problem getting CPU states");
+            }
+
+            return null;
+        }
+
+        /** Executed on the UI thread right before starting the task */
+        @Override protected void onPreExecute() {
+            log("starting data update");
+            _updatingData = true;
+        }
+
+        /** Executed on UI thread after task */
+        @Override protected void onPostExecute(Void v) {
+            log("finished data update");
+            _updatingData = false;
+            updateView();
+        }
+    }
+
+    /** logging */
+    private void log(String s) {
+        Log.d(TAG, s);
     }
 }
