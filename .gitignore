@@ -2,5 +2,8 @@
 bin/*
 gen/*
 
+# maven output
+target/*
+
 # local stuff
 local.properties
