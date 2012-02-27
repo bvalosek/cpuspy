@@ -14,8 +14,11 @@ The latest stable version is available on the Android Market:
 To download the repo and build the APK signed with the SDK debug keys:
    git clone git://github.com/storm717/cpuspy.git
    cd cpuspy
-   ./init.sh
-   make build-debug
+   maven package android:deploy
+
+This requires a properly setup Maven environment with the Android JAR files in
+a local repo, see https://github.com/mosabua/maven-android-sdk-deployer for
+more information.
 
 === INCOMPATIBLE PHONES ===
 The following phones do not seem to expose the necessary file to read in
