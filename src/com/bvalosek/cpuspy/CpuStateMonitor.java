@@ -14,11 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import android.os.SystemClock;
+import android.util.SparseArray;
 
 /**
  * CpuStateMonitor is a class responsible for querying the system and getting
@@ -30,14 +28,17 @@ public class CpuStateMonitor {
     public static final String TIME_IN_STATE_PATH =
         "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
 
-    private static final String TAG = "CpuStateMonitor";
+    //private static final String TAG = "CpuStateMonitor";
 
     private List<CpuState>      _states = new ArrayList<CpuState>();
-    private Map<Integer, Long>  _offsets = new HashMap<Integer, Long>();
+    private SparseArray<Long>  _offsets = new SparseArray<Long>();
 
     /** exception class */
     public class CpuStateMonitorException extends Exception {
-        public CpuStateMonitorException(String s) {
+
+		private static final long serialVersionUID = 2724261744757837755L;
+
+		public CpuStateMonitorException(String s) {
             super(s);
         }
     }
@@ -54,8 +55,8 @@ public class CpuStateMonitor {
 
         /** for sorting, compare the freqs */
         public int compareTo(CpuState state) {
-            Integer a = new Integer(freq);
-            Integer b = new Integer(state.freq);
+            Integer a = Integer.valueOf(freq);
+            Integer b = Integer.valueOf(state.freq);
             return a.compareTo(b);
         }
     }
@@ -68,8 +69,11 @@ public class CpuStateMonitor {
          * from the duration, otherwise just add it to the return List */
         for (CpuState state : _states) {
             long duration = state.duration;
-            if (_offsets.containsKey(state.freq)) {
-                long offset = _offsets.get(state.freq);
+            
+            final Long value = _offsets.get(state.freq);
+            
+            if (value != null) {
+                long offset = value.longValue();
                 if (offset <= duration) {
                     duration -= offset;
                 } else {
@@ -98,9 +102,9 @@ public class CpuStateMonitor {
             sum += state.duration;
         }
 
-        for (Map.Entry<Integer, Long> entry : _offsets.entrySet()) {
-            offset += entry.getValue();
-        }
+        for(int i = 0; i < _offsets.size(); i++) {
+        	   offset += _offsets.valueAt(i).longValue();
+        	}
 
         return sum - offset;
     }
@@ -108,12 +112,12 @@ public class CpuStateMonitor {
     /**
      * @return Map of freq->duration of all the offsets
      */
-    public Map<Integer, Long> getOffsets() {
+    public SparseArray<Long> getOffsets() {
         return _offsets;
     }
 
     /** Sets the offset map (freq->duration offset) */
-    public void setOffsets(Map<Integer, Long> offsets) {
+    public void setOffsets(SparseArray<Long> offsets) {
         _offsets = offsets;
     }
 
@@ -126,7 +130,7 @@ public class CpuStateMonitor {
         updateStates();
 
         for (CpuState state : _states) {
-            _offsets.put(state.freq, state.duration);
+            _offsets.put(state.freq, Long.valueOf(state.duration));
         }
     }
 
@@ -175,7 +179,7 @@ public class CpuStateMonitor {
             String line;
             while ((line = br.readLine()) != null) {
                 // split open line and convert to Integers
-                String[] nums = line.split(" ");
+                final String[] nums = line.split(" ");
                 _states.add(new CpuState(
                         Integer.parseInt(nums[0]),
                         Long.parseLong(nums[1])));

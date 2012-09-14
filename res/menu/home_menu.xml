@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
    <item android:id="@+id/menu_refresh"
-         android:title="Refresh"
+         android:title="@string/Refresh"
          android:icon="@drawable/ic_menu_refresh"
-   />
-   
+   />  
    <item android:id="@+id/menu_reset"
-         android:title="Reset Timers"
+         android:title="@string/ResetTimers"
          android:icon="@android:drawable/ic_menu_delete"
-   />
-   
+   />   
    <item android:id="@+id/menu_restore"
-         android:title="Restore Timers"
+         android:title="@string/RestoreTimers"
          android:icon="@android:drawable/ic_menu_revert"
    />
+   <item android:id="@+id/menu_enable_logging"
+         android:title="@string/EnableLogging"
+         android:checkable="true"
+   />
+   
+   <item android:id="@+id/menu_quit"
+         android:title="@string/Quit"
+   />   
 </menu>

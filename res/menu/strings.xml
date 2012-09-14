@@ -15,5 +15,4 @@
     <string name="RestoreTimers">Restore Timers</string>
     <string name="Refresh">Refresh</string>
     <string name="EnableLogging">Enable Logging</string>
-    <string name="Quit">Quit Application</string>
 </resources>

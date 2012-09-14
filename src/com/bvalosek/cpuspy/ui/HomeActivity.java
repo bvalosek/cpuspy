@@ -27,7 +27,7 @@ import android.widget.TextView;
 import com.bvalosek.cpuspy.*;
 import com.bvalosek.cpuspy.CpuStateMonitor.CpuState;
 import com.bvalosek.cpuspy.CpuStateMonitor.CpuStateMonitorException;
-import android.util.Log;
+
 
 /** main activity class */
 public class HomeActivity extends Activity
@@ -48,6 +48,9 @@ public class HomeActivity extends Activity
     /** whether or not we're updating the data in the background */
     private boolean     _updatingData = false;
 
+	private String StrDeepSleep = "";
+	private String StrMhzTag = "";
+
     /** Initialize the Activity */
     @Override public void onCreate(Bundle savedInstanceState)
     {
@@ -59,12 +62,18 @@ public class HomeActivity extends Activity
         findViews();
 
         // set title to version string
-        setTitle(getResources().getText(R.string.app_name) + " v" +
+        setTitle(getResources().getText(R.string.app_name) + " " + getString(R.string.VersionTag) +
         getResources().getText(R.string.version_name));
 
+        StrDeepSleep = getString(R.string.DeepSleep);
+        StrMhzTag = getString(R.string.MegaHertzTag);
+        
+        
+        
         // see if we're updating data during a config change (rotate screen)
         if (savedInstanceState != null) {
             _updatingData = savedInstanceState.getBoolean("updatingData");
+            Logger.setEnabled(savedInstanceState.getBoolean("logging"));
         }
     }
 
@@ -72,6 +81,7 @@ public class HomeActivity extends Activity
     @Override public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("updatingData", _updatingData);
+        outState.putBoolean("logging", Logger.isEnabled());
     }
 
 
@@ -101,6 +111,12 @@ public class HomeActivity extends Activity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.home_menu, menu);
 
+        MenuItem m = menu.findItem(R.id.menu_enable_logging);
+        if(m != null)
+        {
+        	m.setChecked(Logger.isEnabled());
+        }
+        
         // made it
         return true;
     }
@@ -128,8 +144,16 @@ public class HomeActivity extends Activity
             _app.saveOffsets();
             updateView();
             break;
+        case R.id.menu_enable_logging:
+        	boolean toggle = !item.isChecked();
+        	Logger.setEnabled(toggle);
+        	item.setChecked(toggle);
+        	break;
+        case R.id.menu_quit:
+        	finish();
+        	break;
         }
-
+    
         // made it
         return true;
     }
@@ -147,9 +171,9 @@ public class HomeActivity extends Activity
                 generateStateRow(state, _uiStatesView);
             } else {
                 if (state.freq == 0) {
-                    extraStates.add("Deep Sleep");
+                    extraStates.add(StrDeepSleep );
                 } else {
-                    extraStates.add(state.freq/1000 + " MHz");
+                    extraStates.add(state.freq/1000 + StrMhzTag);
                 }
             }
         }
@@ -232,9 +256,9 @@ public class HomeActivity extends Activity
         // state name
         String sFreq;
         if (state.freq == 0) {
-            sFreq = "Deep Sleep";
+            sFreq = StrDeepSleep;
         } else {
-            sFreq = state.freq / 1000 + " MHz";
+            sFreq = Integer.toString(state.freq / 1000) + StrMhzTag;
         }
 
         // duration
@@ -269,7 +293,7 @@ public class HomeActivity extends Activity
             try {
                 monitor.updateStates();
             } catch (CpuStateMonitorException e) {
-                Log.e(TAG, "Problem getting CPU states");
+            	Logger.logE(TAG, "Problem getting CPU states");
             }
 
             return null;
@@ -277,20 +301,15 @@ public class HomeActivity extends Activity
 
         /** Executed on the UI thread right before starting the task */
         @Override protected void onPreExecute() {
-            log("starting data update");
+            Logger.logD(TAG, "starting data update");
             _updatingData = true;
         }
 
         /** Executed on UI thread after task */
         @Override protected void onPostExecute(Void v) {
-            log("finished data update");
+            Logger.logD(TAG, "finished data update");
             _updatingData = false;
             updateView();
         }
-    }
-
-    /** logging */
-    private void log(String s) {
-        Log.d(TAG, s);
-    }
+    } 
 }
