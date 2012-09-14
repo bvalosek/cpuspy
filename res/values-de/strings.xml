@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CPU Spy</string>
+    <string name="version_name">dev</string>
+    <string name="TimeInState">Zeit pro CPU-Zustand</string>
+    <string name="ErrorNoStatesFile">Keine states-Datei gefunden. Sind sie sicher dass Ihr Telefon kompatibel ist?\n\nWenn Sie ein Custom ROM oder Kernel besitzen, kontaktieren Sie bitte den Entwickler und informieren Sie Ihn dass die states-Datei nicht lesbar ist.</string>
+    <string name="UnusedCPUStates">Ungenutzte CPU-Zustände</string>
+    <string name="TotalStateTime">Gesamte Zustandszeit</string>
+    <string name="KernelInfo">Kernel Info</string>
+    <string name="Kernel">Kernel</string>
+    <string name="DeepSleep">Tiefschlaf</string>
+    <string name="VersionTag"> v</string>
+    <string name="MegaHertzTag"> MHz</string>
+    <string name="ResetTimers">Zeiten zurücksetzen</string>
+    <string name="RestoreTimers">Zeiten wiederherstellen</string>
+    <string name="Refresh">Aktualisieren</string>
+    <string name="EnableLogging">Logging einschalten</string>
+    <string name="Quit">Anwendung beenden</string>
+</resources>
